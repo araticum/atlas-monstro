@@ -8,7 +8,10 @@
 		}"
 	>
 		<!-- Removing everything until the task is loaded to prevent empty initialization of other components -->
-		<div v-if="visible" class="task-view">
+		<div
+			v-if="visible"
+			class="task-view"
+		>
 			<BaseButton
 				v-if="!isModal"
 				class="back-button mbs-2"
@@ -25,8 +28,14 @@
 				@update:task="Object.assign(task, $event)"
 				@close="$emit('close')"
 			/>
-			<h6 v-if="project?.id" class="subtitle">
-				<template v-for="p in projectStore.getAncestors(project)" :key="p.id">
+			<h6
+				v-if="project?.id"
+				class="subtitle"
+			>
+				<template
+					v-for="p in projectStore.getAncestors(project)"
+					:key="p.id"
+				>
 					<a
 						v-if="
 							router.options.history.state?.back?.includes(
@@ -45,7 +54,10 @@
 					>
 						{{ getProjectTitle(p) }}
 					</RouterLink>
-					<span v-if="p.id !== project?.id" class="has-text-grey-light">
+					<span
+						v-if="p.id !== project?.id"
+						class="has-text-grey-light"
+					>
 						&gt;
 					</span>
 				</template>
@@ -61,7 +73,10 @@
 					class="column detail-content"
 				>
 					<div class="columns details">
-						<div v-if="activeFields.assignees" class="column assignees">
+						<div
+							v-if="activeFields.assignees"
+							class="column assignees"
+						>
 							<!-- Assignees -->
 							<div class="detail-title">
 								<Icon icon="users" />
@@ -74,10 +89,20 @@
 								:project-id="task.projectId"
 								:task-id="task.id"
 							/>
-							<AssigneeList v-else :assignees="task.assignees" class="mbs-2" />
+							<AssigneeList
+								v-else
+								:assignees="task.assignees"
+								class="mbs-2"
+							/>
 						</div>
-						<CustomTransition name="flash-background" appear>
-							<div v-if="activeFields.priority" class="column">
+						<CustomTransition
+							name="flash-background"
+							appear
+						>
+							<div
+								v-if="activeFields.priority"
+								class="column"
+							>
 								<!-- Priority -->
 								<div class="detail-title">
 									<Icon icon="exclamation-circle" />
@@ -91,8 +116,14 @@
 								/>
 							</div>
 						</CustomTransition>
-						<CustomTransition name="flash-background" appear>
-							<div v-if="activeFields.dueDate" class="column">
+						<CustomTransition
+							name="flash-background"
+							appear
+						>
+							<div
+								v-if="activeFields.dueDate"
+								class="column"
+							>
 								<!-- Due Date -->
 								<div class="detail-title">
 									<Icon icon="calendar" />
@@ -123,8 +154,14 @@
 								</div>
 							</div>
 						</CustomTransition>
-						<CustomTransition name="flash-background" appear>
-							<div v-if="activeFields.percentDone" class="column">
+						<CustomTransition
+							name="flash-background"
+							appear
+						>
+							<div
+								v-if="activeFields.percentDone"
+								class="column"
+							>
 								<!-- Progress -->
 								<div class="detail-title">
 									<Icon icon="percent" />
@@ -138,8 +175,14 @@
 								/>
 							</div>
 						</CustomTransition>
-						<CustomTransition name="flash-background" appear>
-							<div v-if="activeFields.startDate" class="column">
+						<CustomTransition
+							name="flash-background"
+							appear
+						>
+							<div
+								v-if="activeFields.startDate"
+								class="column"
+							>
 								<!-- Start Date -->
 								<div class="detail-title">
 									<Icon icon="play" />
@@ -170,8 +213,14 @@
 								</div>
 							</div>
 						</CustomTransition>
-						<CustomTransition name="flash-background" appear>
-							<div v-if="activeFields.endDate" class="column">
+						<CustomTransition
+							name="flash-background"
+							appear
+						>
+							<div
+								v-if="activeFields.endDate"
+								class="column"
+							>
 								<!-- End Date -->
 								<div class="detail-title">
 									<Icon icon="stop" />
@@ -202,8 +251,14 @@
 								</div>
 							</div>
 						</CustomTransition>
-						<CustomTransition name="flash-background" appear>
-							<div v-if="activeFields.reminders" class="column">
+						<CustomTransition
+							name="flash-background"
+							appear
+						>
+							<div
+								v-if="activeFields.reminders"
+								class="column"
+							>
 								<!-- Reminders -->
 								<div class="detail-title">
 									<Icon :icon="['far', 'clock']" />
@@ -217,8 +272,14 @@
 								/>
 							</div>
 						</CustomTransition>
-						<CustomTransition name="flash-background" appear>
-							<div v-if="activeFields.repeatAfter" class="column">
+						<CustomTransition
+							name="flash-background"
+							appear
+						>
+							<div
+								v-if="activeFields.repeatAfter"
+								class="column"
+							>
 								<!-- Repeat after -->
 								<div class="is-flex is-justify-content-space-between">
 									<div class="detail-title">
@@ -243,8 +304,14 @@
 								/>
 							</div>
 						</CustomTransition>
-						<CustomTransition name="flash-background" appear>
-							<div v-if="activeFields.color" class="column">
+						<CustomTransition
+							name="flash-background"
+							appear
+						>
+							<div
+								v-if="activeFields.color"
+								class="column"
+							>
 								<!-- Color -->
 								<div class="detail-title">
 									<Icon icon="fill-drip" />
@@ -261,7 +328,10 @@
 					</div>
 
 					<!-- Labels -->
-					<div v-if="activeFields.labels" class="labels-list details">
+					<div
+						v-if="activeFields.labels"
+						class="labels-list details"
+					>
 						<div class="detail-title">
 							<span class="icon is-grey">
 								<Icon icon="tags" />
@@ -277,13 +347,16 @@
 						/>
 					</div>
 
-					<CustomFields :task-id="task.id" :disabled="!canWrite" />
+					<CustomFields
+						:task-id="task.id"
+						:disabled="!canWrite"
+					/>
 
 					<TaskTemplates
 						v-if="task.projectId"
 						:project-id="task.projectId"
 						:current-task-id="task.id"
-						@task-created="handleTemplateTaskCreated"
+						@taskCreated="handleTemplateTaskCreated"
 					/>
 
 					<TaskActivity :task-id="task.id" />
@@ -329,7 +402,10 @@
 					</div>
 
 					<!-- Related Tasks -->
-					<div v-if="activeFields.relatedTasks" class="content details mbe-0">
+					<div
+						v-if="activeFields.relatedTasks"
+						class="content details mbe-0"
+					>
 						<h3>
 							<span class="icon is-grey">
 								<Icon icon="sitemap" />
@@ -347,7 +423,10 @@
 					</div>
 
 					<!-- Move Task -->
-					<div v-if="activeFields.moveProject" class="content details">
+					<div
+						v-if="activeFields.moveProject"
+						class="content details"
+					>
 						<h3>
 							<span class="icon is-grey">
 								<Icon icon="list" />
@@ -374,7 +453,10 @@
 					/>
 
 					<!-- Marker element for scroll-to-bottom button visibility -->
-					<div ref="contentBottomMarker" class="content-bottom-marker" />
+					<div
+						ref="contentBottomMarker"
+						class="content-bottom-marker"
+					/>
 				</div>
 
 				<!-- Task Actions -->
@@ -564,7 +646,10 @@
 				</div>
 			</div>
 			<!-- Created / Updated [by] -->
-			<CreatedUpdated v-if="!canWrite && !isModal" :task="task" />
+			<CreatedUpdated
+				v-if="!canWrite && !isModal"
+				:task="task"
+			/>
 		</div>
 
 		<BaseButton
@@ -607,160 +692,160 @@ import {
 	watch,
 	nextTick,
 	onMounted,
-} from "vue";
+} from 'vue'
 import {
 	useRouter,
 	useRoute,
 	type RouteLocation,
 	onBeforeRouteLeave,
-} from "vue-router";
-import { storeToRefs } from "pinia";
-import { useI18n } from "vue-i18n";
+} from 'vue-router'
+import { storeToRefs } from 'pinia'
+import { useI18n } from 'vue-i18n'
 import {
 	unrefElement,
 	useDebounceFn,
 	useElementSize,
 	useIntersectionObserver,
 	useMutationObserver,
-} from "@vueuse/core";
-import { klona } from "klona/lite";
+} from '@vueuse/core'
+import { klona } from 'klona/lite'
 
-import TaskService from "@/services/task";
-import TaskModel from "@/models/task";
+import TaskService from '@/services/task'
+import TaskModel from '@/models/task'
 
-import type { ITask } from "@/modelTypes/ITask";
-import type { IProject } from "@/modelTypes/IProject";
+import type { ITask } from '@/modelTypes/ITask'
+import type { IProject } from '@/modelTypes/IProject'
 
-import { PRIORITIES, type Priority } from "@/constants/priorities";
-import { PERMISSIONS } from "@/constants/permissions";
+import { PRIORITIES, type Priority } from '@/constants/priorities'
+import { PERMISSIONS } from '@/constants/permissions'
 
-import BaseButton from "@/components/base/BaseButton.vue";
+import BaseButton from '@/components/base/BaseButton.vue'
 
 // partials
-import Attachments from "@/components/tasks/partials/Attachments.vue";
-import ChecklistSummary from "@/components/tasks/partials/ChecklistSummary.vue";
-import ColorPicker from "@/components/input/ColorPicker.vue";
-import Comments from "@/components/tasks/partials/Comments.vue";
-import CustomFields from "@/components/tasks/CustomFields.vue";
-import TaskActivity from "@/components/tasks/TaskActivity.vue";
-import CreatedUpdated from "@/components/tasks/partials/CreatedUpdated.vue";
-import Datepicker from "@/components/input/Datepicker.vue";
-import Description from "@/components/tasks/partials/Description.vue";
-import EditAssignees from "@/components/tasks/partials/EditAssignees.vue";
-import EditLabels from "@/components/tasks/partials/EditLabels.vue";
-import Heading from "@/components/tasks/partials/Heading.vue";
-import ProjectSearch from "@/components/tasks/partials/ProjectSearch.vue";
-import PercentDoneSelect from "@/components/tasks/partials/PercentDoneSelect.vue";
-import PrioritySelect from "@/components/tasks/partials/PrioritySelect.vue";
-import RelatedTasks from "@/components/tasks/partials/RelatedTasks.vue";
-import Reminders from "@/components/tasks/partials/Reminders.vue";
-import RepeatAfter from "@/components/tasks/partials/RepeatAfter.vue";
-import TaskSubscription from "@/components/misc/Subscription.vue";
-import CustomTransition from "@/components/misc/CustomTransition.vue";
-import AssigneeList from "@/components/tasks/partials/AssigneeList.vue";
-import Reactions from "@/components/input/Reactions.vue";
-import TaskTemplates from "@/components/tasks/TaskTemplates.vue";
+import Attachments from '@/components/tasks/partials/Attachments.vue'
+import ChecklistSummary from '@/components/tasks/partials/ChecklistSummary.vue'
+import ColorPicker from '@/components/input/ColorPicker.vue'
+import Comments from '@/components/tasks/partials/Comments.vue'
+import CustomFields from '@/components/tasks/CustomFields.vue'
+import TaskActivity from '@/components/tasks/TaskActivity.vue'
+import CreatedUpdated from '@/components/tasks/partials/CreatedUpdated.vue'
+import Datepicker from '@/components/input/Datepicker.vue'
+import Description from '@/components/tasks/partials/Description.vue'
+import EditAssignees from '@/components/tasks/partials/EditAssignees.vue'
+import EditLabels from '@/components/tasks/partials/EditLabels.vue'
+import Heading from '@/components/tasks/partials/Heading.vue'
+import ProjectSearch from '@/components/tasks/partials/ProjectSearch.vue'
+import PercentDoneSelect from '@/components/tasks/partials/PercentDoneSelect.vue'
+import PrioritySelect from '@/components/tasks/partials/PrioritySelect.vue'
+import RelatedTasks from '@/components/tasks/partials/RelatedTasks.vue'
+import Reminders from '@/components/tasks/partials/Reminders.vue'
+import RepeatAfter from '@/components/tasks/partials/RepeatAfter.vue'
+import TaskSubscription from '@/components/misc/Subscription.vue'
+import CustomTransition from '@/components/misc/CustomTransition.vue'
+import AssigneeList from '@/components/tasks/partials/AssigneeList.vue'
+import Reactions from '@/components/input/Reactions.vue'
+import TaskTemplates from '@/components/tasks/TaskTemplates.vue'
 
-import { uploadFile } from "@/helpers/attachments";
-import { getProjectTitle } from "@/helpers/getProjectTitle";
-import { isAppleDevice } from "@/helpers/isAppleDevice";
-import { scrollIntoView } from "@/helpers/scrollIntoView";
-import { TASK_REPEAT_MODES } from "@/types/IRepeatMode";
-import { playPopSound } from "@/helpers/playPop";
+import { uploadFile } from '@/helpers/attachments'
+import { getProjectTitle } from '@/helpers/getProjectTitle'
+import { isAppleDevice } from '@/helpers/isAppleDevice'
+import { scrollIntoView } from '@/helpers/scrollIntoView'
+import { TASK_REPEAT_MODES } from '@/types/IRepeatMode'
+import { playPopSound } from '@/helpers/playPop'
 
-import { useAttachmentStore } from "@/stores/attachments";
-import { useTaskStore } from "@/stores/tasks";
-import { useKanbanStore } from "@/stores/kanban";
-import { useProjectStore } from "@/stores/projects";
-import { useAuthStore } from "@/stores/auth";
-import { useBaseStore } from "@/stores/base";
+import { useAttachmentStore } from '@/stores/attachments'
+import { useTaskStore } from '@/stores/tasks'
+import { useKanbanStore } from '@/stores/kanban'
+import { useProjectStore } from '@/stores/projects'
+import { useAuthStore } from '@/stores/auth'
+import { useBaseStore } from '@/stores/base'
 
-import { useTitle } from "@/composables/useTitle";
-import { useTaskDetailShortcuts } from "@/composables/useTaskDetailShortcuts";
+import { useTitle } from '@/composables/useTitle'
+import { useTaskDetailShortcuts } from '@/composables/useTaskDetailShortcuts'
 
-import { success } from "@/message";
-import type { Action as MessageAction } from "@/message";
+import { success } from '@/message'
+import type { Action as MessageAction } from '@/message'
 
 const props = defineProps<{
-	taskId: ITask["id"];
-	backdropView?: RouteLocation["fullPath"];
-}>();
+	taskId: ITask['id'];
+	backdropView?: RouteLocation['fullPath'];
+}>()
 
 defineEmits<{
 	close: [];
-}>();
+}>()
 
-const router = useRouter();
-const route = useRoute();
-const { t } = useI18n({ useScope: "global" });
+const router = useRouter()
+const route = useRoute()
+const { t } = useI18n({ useScope: 'global' })
 
-const projectStore = useProjectStore();
-const attachmentStore = useAttachmentStore();
-const { hasAttachments } = storeToRefs(attachmentStore);
-const taskStore = useTaskStore();
-const kanbanStore = useKanbanStore();
-const authStore = useAuthStore();
-const baseStore = useBaseStore();
+const projectStore = useProjectStore()
+const attachmentStore = useAttachmentStore()
+const { hasAttachments } = storeToRefs(attachmentStore)
+const taskStore = useTaskStore()
+const kanbanStore = useKanbanStore()
+const authStore = useAuthStore()
+const baseStore = useBaseStore()
 
-const task = ref<ITask>(new TaskModel());
-const taskNotFound = ref(false);
-const taskTitle = computed(() => task.value.title);
-useTitle(taskTitle);
+const task = ref<ITask>(new TaskModel())
+const taskNotFound = ref(false)
+const taskTitle = computed(() => task.value.title)
+useTitle(taskTitle)
 
 const lastProject = computed(() => {
-	const backRoute = router.options.history.state?.back;
-	if (!backRoute || typeof backRoute !== "string") {
-		return null;
+	const backRoute = router.options.history.state?.back
+	if (!backRoute || typeof backRoute !== 'string') {
+		return null
 	}
 
-	const projectMatch = backRoute.match(/\/projects\/(-?\d+)/);
+	const projectMatch = backRoute.match(/\/projects\/(-?\d+)/)
 	if (!projectMatch || !projectMatch[1]) {
-		return null;
+		return null
 	}
 
-	const id = parseInt(projectMatch[1]);
+	const id = parseInt(projectMatch[1])
 
-	return projectStore.projects[id] ?? null;
-});
+	return projectStore.projects[id] ?? null
+})
 
 const lastProjectOrTaskProject = computed(
 	() => lastProject.value ?? project.value,
-);
+)
 
 // Use Shift+R on macOS (Alt+R produces special characters depending on keyboard layout)
 // Use Alt+r on other platforms
 const reminderShortcut = computed(() =>
-	isAppleDevice() ? "Shift+KeyR" : "Alt+KeyR",
-);
+	isAppleDevice() ? 'Shift+KeyR' : 'Alt+KeyR',
+)
 
 onBeforeRouteLeave(async () => {
 	if (taskNotFound.value) {
-		return;
+		return
 	}
 
 	if (!lastProjectOrTaskProject.value) {
 		await new Promise<void>((resolve) => {
 			const timeout = setTimeout(() => {
-				stop();
-				resolve();
-			}, 5000); // 5 second timeout
+				stop()
+				resolve()
+			}, 5000) // 5 second timeout
 
 			const stop = watch(lastProjectOrTaskProject, (p) => {
 				if (p) {
-					clearTimeout(timeout);
-					stop();
-					resolve();
+					clearTimeout(timeout)
+					stop()
+					resolve()
 				}
-			});
-		});
+			})
+		})
 	}
 
 	if (lastProjectOrTaskProject.value) {
 		await baseStore.handleSetCurrentProjectIfNotSet(
 			lastProjectOrTaskProject.value,
-		);
+		)
 	}
-});
+})
 
 // We doubled the task color property here because verte does not have a real change property, leading
 // to the color property change being triggered when the # is removed from it, leading to an update,
@@ -768,183 +853,183 @@ onBeforeRouteLeave(async () => {
 // updated, changed, updated and so on.
 // To prevent this, we put the task color property in a separate value which is set to the task color
 // when it is saved and loaded.
-const taskColor = ref<ITask["hexColor"]>("");
+const taskColor = ref<ITask['hexColor']>('')
 
 // Used to avoid flashing of empty elements if the task content is not yet loaded.
-const visible = ref(false);
+const visible = ref(false)
 
-const project = computed(() => projectStore.projects[task.value.projectId]);
+const project = computed(() => projectStore.projects[task.value.projectId])
 
 const projectRoute = computed(() => ({
-	name: "project.index",
+	name: 'project.index',
 	params: { projectId: task.value.projectId },
 	hash: route.hash,
-}));
+}))
 
 const canWrite = computed(
 	() =>
 		task.value.maxPermission !== null &&
 		task.value.maxPermission > PERMISSIONS.READ,
-);
+)
 
 const color = computed(() => {
-	const color = task.value.getHexColor ? task.value.getHexColor() : undefined;
+	const color = task.value.getHexColor ? task.value.getHexColor() : undefined
 
-	return color;
-});
+	return color
+})
 
-const isModal = computed(() => Boolean(props.backdropView));
+const isModal = computed(() => Boolean(props.backdropView))
 
 function attachmentUpload(file: File, onSuccess?: (url: string) => void) {
-	return uploadFile(props.taskId, file, onSuccess);
+	return uploadFile(props.taskId, file, onSuccess)
 }
 
-const heading = ref<HTMLElement | null>(null);
+const heading = ref<HTMLElement | null>(null)
 
 async function scrollToHeading() {
-	scrollIntoView(unrefElement(heading));
+	scrollIntoView(unrefElement(heading))
 }
 
-const attachmentsRef = ref<InstanceType<typeof Attachments> | null>(null);
+const attachmentsRef = ref<InstanceType<typeof Attachments> | null>(null)
 
-const taskViewContainer = ref<HTMLElement | null>(null);
-const scrollContainer = ref<HTMLElement | null>(null);
-const contentBottomMarker = ref<HTMLElement | null>(null);
-const bottomMarkerVisible = ref(true);
-const isScrollable = ref(false);
+const taskViewContainer = ref<HTMLElement | null>(null)
+const scrollContainer = ref<HTMLElement | null>(null)
+const contentBottomMarker = ref<HTMLElement | null>(null)
+const bottomMarkerVisible = ref(true)
+const isScrollable = ref(false)
 
 function resolveScrollContainer() {
-	let el = taskViewContainer.value;
+	let el = taskViewContainer.value
 
 	while (el) {
-		const overflowY = getComputedStyle(el).overflowY;
-		if (["auto", "scroll", "overlay"].includes(overflowY)) {
-			scrollContainer.value = el;
-			return;
+		const overflowY = getComputedStyle(el).overflowY
+		if (['auto', 'scroll', 'overlay'].includes(overflowY)) {
+			scrollContainer.value = el
+			return
 		}
-		el = el.parentElement;
+		el = el.parentElement
 	}
 
 	scrollContainer.value =
 		(document.scrollingElement as HTMLElement | null) ??
-		document.documentElement;
+		document.documentElement
 }
 
 function updateScrollable() {
-	const scroller = scrollContainer.value;
+	const scroller = scrollContainer.value
 	if (!scroller) {
-		isScrollable.value = false;
-		return;
+		isScrollable.value = false
+		return
 	}
 
-	isScrollable.value = scroller.scrollHeight > scroller.clientHeight + 1;
+	isScrollable.value = scroller.scrollHeight > scroller.clientHeight + 1
 }
 
 const showScrollToCommentsButton = computed(() => {
-	return isScrollable.value && !bottomMarkerVisible.value;
-});
+	return isScrollable.value && !bottomMarkerVisible.value
+})
 
 function scrollToBottom() {
 	if (!contentBottomMarker.value) {
-		return;
+		return
 	}
 
 	contentBottomMarker.value.scrollIntoView({
-		behavior: "smooth",
-		block: "end",
-		inline: "nearest",
-	});
+		behavior: 'smooth',
+		block: 'end',
+		inline: 'nearest',
+	})
 }
 
 useIntersectionObserver(
 	contentBottomMarker,
 	([entry]) => {
-		bottomMarkerVisible.value = entry?.isIntersecting ?? true;
+		bottomMarkerVisible.value = entry?.isIntersecting ?? true
 	},
 	{ threshold: 0.1 },
-);
+)
 
 const debouncedMutationHandler = useDebounceFn(async () => {
-	await nextTick();
-	resolveScrollContainer();
-	updateScrollable();
-}, 100);
+	await nextTick()
+	resolveScrollContainer()
+	updateScrollable()
+}, 100)
 
 useMutationObserver(taskViewContainer, debouncedMutationHandler, {
 	subtree: true,
 	childList: true,
-});
+})
 
-const { height: scrollContainerHeight } = useElementSize(scrollContainer);
-watch(scrollContainerHeight, () => updateScrollable());
+const { height: scrollContainerHeight } = useElementSize(scrollContainer)
+watch(scrollContainerHeight, () => updateScrollable())
 
 onMounted(async () => {
-	await nextTick();
-	resolveScrollContainer();
-	updateScrollable();
-});
+	await nextTick()
+	resolveScrollContainer()
+	updateScrollable()
+})
 
-const taskService = shallowReactive(new TaskService());
+const taskService = shallowReactive(new TaskService())
 
 // load task
 watch(
 	() => props.taskId,
 	async (id) => {
 		if (id === undefined) {
-			return;
+			return
 		}
 
 		try {
 			const loaded = await taskService.get(
 				{ id },
-				{ expand: ["reactions", "comments", "is_unread"] },
-			);
-			Object.assign(task.value, loaded);
-			attachmentStore.set(task.value.attachments);
-			taskColor.value = task.value.hexColor;
-			setActiveFields();
+				{ expand: ['reactions', 'comments', 'is_unread'] },
+			)
+			Object.assign(task.value, loaded)
+			attachmentStore.set(task.value.attachments)
+			taskColor.value = task.value.hexColor
+			setActiveFields()
 
 			if (task.value.isUnread) {
-				await taskStore.markTaskAsRead(task.value.id);
-				task.value.isUnread = false;
+				await taskStore.markTaskAsRead(task.value.id)
+				task.value.isUnread = false
 			}
 
 			if (lastProject.value) {
-				await baseStore.handleSetCurrentProjectIfNotSet(lastProject.value);
+				await baseStore.handleSetCurrentProjectIfNotSet(lastProject.value)
 			}
 		} catch (e) {
 			if (e?.response?.status === 404) {
-				taskNotFound.value = true;
-				router.replace({ name: "not-found" });
-				return;
+				taskNotFound.value = true
+				router.replace({ name: 'not-found' })
+				return
 			}
 
-			throw e;
+			throw e
 		} finally {
-			await nextTick();
-			scrollToHeading();
-			resolveScrollContainer();
-			updateScrollable();
-			visible.value = true;
+			await nextTick()
+			scrollToHeading()
+			resolveScrollContainer()
+			updateScrollable()
+			visible.value = true
 		}
 	},
 	{ immediate: true },
-);
+)
 
 type FieldType =
-	| "assignees"
-	| "attachments"
-	| "color"
-	| "dueDate"
-	| "endDate"
-	| "labels"
-	| "moveProject"
-	| "percentDone"
-	| "priority"
-	| "relatedTasks"
-	| "reminders"
-	| "repeatAfter"
-	| "startDate";
+	| 'assignees'
+	| 'attachments'
+	| 'color'
+	| 'dueDate'
+	| 'endDate'
+	| 'labels'
+	| 'moveProject'
+	| 'percentDone'
+	| 'priority'
+	| 'relatedTasks'
+	| 'reminders'
+	| 'repeatAfter'
+	| 'startDate';
 
 const activeFields: { [type in FieldType]: boolean } = reactive({
 	assignees: false,
@@ -960,7 +1045,7 @@ const activeFields: { [type in FieldType]: boolean } = reactive({
 	reminders: false,
 	repeatAfter: false,
 	startDate: false,
-});
+})
 
 function setActiveFields() {
 	// FIXME: are these lines necessary?
@@ -968,19 +1053,19 @@ function setActiveFields() {
 	// task.endDate = task.endDate || null
 
 	// Set all active fields based on values in the model
-	activeFields.assignees = task.value.assignees.length > 0;
-	activeFields.attachments = task.value.attachments.length > 0;
-	activeFields.dueDate = task.value.dueDate !== null;
-	activeFields.endDate = task.value.endDate !== null;
-	activeFields.labels = task.value.labels.length > 0;
-	activeFields.percentDone = task.value.percentDone > 0;
-	activeFields.priority = task.value.priority !== PRIORITIES.UNSET;
-	activeFields.relatedTasks = Object.keys(task.value.relatedTasks).length > 0;
-	activeFields.reminders = task.value.reminders.length > 0;
+	activeFields.assignees = task.value.assignees.length > 0
+	activeFields.attachments = task.value.attachments.length > 0
+	activeFields.dueDate = task.value.dueDate !== null
+	activeFields.endDate = task.value.endDate !== null
+	activeFields.labels = task.value.labels.length > 0
+	activeFields.percentDone = task.value.percentDone > 0
+	activeFields.priority = task.value.priority !== PRIORITIES.UNSET
+	activeFields.relatedTasks = Object.keys(task.value.relatedTasks).length > 0
+	activeFields.reminders = task.value.reminders.length > 0
 	activeFields.repeatAfter =
 		task.value.repeatAfter?.amount > 0 ||
-		task.value.repeatMode !== TASK_REPEAT_MODES.REPEAT_MODE_DEFAULT;
-	activeFields.startDate = task.value.startDate !== null;
+		task.value.repeatMode !== TASK_REPEAT_MODES.REPEAT_MODE_DEFAULT
+	activeFields.startDate = task.value.startDate !== null
 }
 
 const activeFieldElements: { [id in FieldType]: HTMLElement | null } = reactive(
@@ -999,37 +1084,37 @@ const activeFieldElements: { [id in FieldType]: HTMLElement | null } = reactive(
 		repeatAfter: null,
 		startDate: null,
 	},
-);
+)
 
 function setFieldRef(name, e) {
-	activeFieldElements[name] = unrefElement(e);
+	activeFieldElements[name] = unrefElement(e)
 }
 
 function setFieldActive(fieldName: keyof typeof activeFields) {
-	activeFields[fieldName] = true;
+	activeFields[fieldName] = true
 	nextTick(() => {
-		const el = activeFieldElements[fieldName];
+		const el = activeFieldElements[fieldName]
 
 		if (!el) {
-			return;
+			return
 		}
 
-		el.focus();
+		el.focus()
 
 		// scroll the field to the center of the screen if not in viewport already
-		scrollIntoView(el);
-	});
+		scrollIntoView(el)
+	})
 }
 
 function openAttachments() {
-	activeFields.attachments = true;
+	activeFields.attachments = true
 	nextTick(() => {
-		const el = activeFieldElements.attachments;
+		const el = activeFieldElements.attachments
 		if (el) {
-			scrollIntoView(el);
+			scrollIntoView(el)
 		}
-		attachmentsRef.value?.openFilePicker();
-	});
+		attachmentsRef.value?.openFilePicker()
+	})
 }
 
 async function saveTask(
@@ -1037,14 +1122,14 @@ async function saveTask(
 	undoCallback?: () => void,
 ) {
 	if (currentTask === null) {
-		currentTask = klona(task.value);
+		currentTask = klona(task.value)
 	}
 
 	if (!canWrite.value) {
-		return;
+		return
 	}
 
-	currentTask.hexColor = taskColor.value;
+	currentTask.hexColor = taskColor.value
 
 	// If no end date is being set, but a start date and due date,
 	// use the due date as the end date
@@ -1053,100 +1138,100 @@ async function saveTask(
 		currentTask.startDate !== null &&
 		currentTask.dueDate !== null
 	) {
-		currentTask.endDate = currentTask.dueDate;
+		currentTask.endDate = currentTask.dueDate
 	}
 
-	const updatedTask = await taskStore.update(currentTask); // TODO: markraw ?
-	Object.assign(task.value, updatedTask);
-	setActiveFields();
+	const updatedTask = await taskStore.update(currentTask) // TODO: markraw ?
+	Object.assign(task.value, updatedTask)
+	setActiveFields()
 
-	let actions: MessageAction[] = [];
+	let actions: MessageAction[] = []
 	if (undoCallback) {
 		actions = [
 			{
-				title: t("task.undo"),
+				title: t('task.undo'),
 				callback: undoCallback,
 			},
-		];
+		]
 	}
-	success({ message: t("task.detail.updateSuccess") }, actions);
+	success({ message: t('task.detail.updateSuccess') }, actions)
 }
 
 useTaskDetailShortcuts({
 	task: () => task.value,
 	taskTitle: () => taskTitle.value,
 	onSave: saveTask,
-});
+})
 
-const showDeleteModal = ref(false);
+const showDeleteModal = ref(false)
 
 async function deleteTask() {
-	await taskStore.delete(task.value);
-	success({ message: t("task.detail.deleteSuccess") });
+	await taskStore.delete(task.value)
+	success({ message: t('task.detail.deleteSuccess') })
 	router.push({
-		name: "project.index",
+		name: 'project.index',
 		params: { projectId: task.value.projectId },
-	});
+	})
 }
 
 async function toggleTaskDone() {
 	const newTask = {
 		...task.value,
 		done: !task.value.done,
-	};
-
-	if (newTask.done) {
-		playPopSound();
 	}
 
-	await saveTask(newTask, toggleTaskDone);
+	if (newTask.done) {
+		playPopSound()
+	}
+
+	await saveTask(newTask, toggleTaskDone)
 }
 
 async function changeProject(project: IProject | null) {
 	if (project === null) {
-		return;
+		return
 	}
-	kanbanStore.removeTaskInBucket(task.value);
+	kanbanStore.removeTaskInBucket(task.value)
 	await saveTask({
 		...task.value,
 		projectId: project.id,
-	});
-	baseStore.setCurrentProject(project);
+	})
+	baseStore.setCurrentProject(project)
 }
 
 async function toggleFavorite() {
-	const newTask = await taskStore.toggleFavorite(task.value);
-	Object.assign(task.value, newTask);
+	const newTask = await taskStore.toggleFavorite(task.value)
+	Object.assign(task.value, newTask)
 }
 
 async function toggleTemplate() {
 	const updatedTask = await taskStore.setTaskTemplate(
 		task.value.id,
 		!task.value.isTemplate,
-	);
-	Object.assign(task.value, updatedTask);
+	)
+	Object.assign(task.value, updatedTask)
 	success({
 		message: task.value.isTemplate
-			? t("task.templates.markedSuccess")
-			: t("task.templates.unmarkedSuccess"),
-	});
+			? t('task.templates.markedSuccess')
+			: t('task.templates.unmarkedSuccess'),
+	})
 }
 
 function handleTemplateTaskCreated(createdTask: ITask) {
 	router.push({
-		name: "task.detail",
+		name: 'task.detail',
 		params: { id: createdTask.id },
-	});
+	})
 }
 
 async function duplicateCurrentTask() {
-	const duplicatedTask = await taskStore.duplicateTask(task.value.id);
+	const duplicatedTask = await taskStore.duplicateTask(task.value.id)
 	if (duplicatedTask) {
-		success({ message: t("task.detail.duplicateSuccess") });
+		success({ message: t('task.detail.duplicateSuccess') })
 		router.push({
-			name: "task.detail",
+			name: 'task.detail',
 			params: { id: duplicatedTask.id },
-		});
+		})
 	}
 }
 
@@ -1154,35 +1239,35 @@ async function setPriority(priority: Priority) {
 	const newTask: ITask = {
 		...task.value,
 		priority,
-	};
+	}
 
-	return saveTask(newTask);
+	return saveTask(newTask)
 }
 
 async function setPercentDone(percentDone: number) {
 	const newTask: ITask = {
 		...task.value,
 		percentDone,
-	};
+	}
 
-	return saveTask(newTask);
+	return saveTask(newTask)
 }
 
 async function removeRepeatAfter() {
-	task.value.repeatAfter.amount = 0;
-	task.value.repeatMode = TASK_REPEAT_MODES.REPEAT_MODE_DEFAULT;
-	await saveTask();
+	task.value.repeatAfter.amount = 0
+	task.value.repeatMode = TASK_REPEAT_MODES.REPEAT_MODE_DEFAULT
+	await saveTask()
 }
 
 function setRelatedTasksActive() {
-	setFieldActive("relatedTasks");
+	setFieldActive('relatedTasks')
 
 	// If the related tasks are already available, show the form again
-	const el = activeFieldElements["relatedTasks"];
+	const el = activeFieldElements['relatedTasks']
 	for (const child in el?.children) {
-		if (el?.children[child]?.id === "showRelatedTasksFormButton") {
-			el?.children[child]?.click();
-			break;
+		if (el?.children[child]?.id === 'showRelatedTasksFormButton') {
+			el?.children[child]?.click()
+			break
 		}
 	}
 }

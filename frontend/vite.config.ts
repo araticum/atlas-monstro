@@ -26,7 +26,7 @@ const PREFIXED_SCSS_STYLES = `@use "sass:math";
 /*
 ** Configure sentry plugin
 */
-function getSentryConfig(env: ImportMetaEnv): SentryVitePluginOptions {
+function getSentryConfig(env: Record<string, string>): SentryVitePluginOptions {
 	return {
 		// keep these flags for easier debugging
 		disable: true,

@@ -4,6 +4,7 @@
     "@vue/tsconfig/tsconfig.json"
   ],
   "include": [
+    "env.d.ts",
     "env.config.d.ts",
     "vite.config.*",
     "vitest.config.*",

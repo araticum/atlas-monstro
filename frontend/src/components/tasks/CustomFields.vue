@@ -1,5 +1,8 @@
 <template>
-	<div v-if="schemas.length > 0" class="details custom-fields">
+	<div
+		v-if="schemas.length > 0"
+		class="details custom-fields"
+	>
 		<h3>
 			<span class="icon is-grey">
 				<Icon icon="list-alt" />
@@ -13,7 +16,12 @@
 			class="field"
 		>
 			<label class="label">{{ schema.name }}</label>
-			<p v-if="schema.description" class="help">{{ schema.description }}</p>
+			<p
+				v-if="schema.description"
+				class="help"
+			>
+				{{ schema.description }}
+			</p>
 
 			<div class="control">
 				<input
@@ -47,7 +55,9 @@
 					:disabled="disabled"
 					@change="save(schema)"
 				>
-					<option value="">—</option>
+					<option value="">
+						—
+					</option>
 					<option
 						v-for="option in getOptions(schema)"
 						:key="option.value"
@@ -74,7 +84,7 @@
 					class="textarea"
 					:disabled="disabled"
 					@blur="save(schema)"
-				></textarea>
+				/>
 			</div>
 		</div>
 	</div>
@@ -95,6 +105,20 @@ type Schema = {
 	defaultValue?: string
 }
 
+type CustomFieldValue = {
+	field_id?: number
+	fieldId?: number
+	value: unknown
+}
+
+type CustomFieldsResponse = {
+	schemas?: Array<Schema & {
+		field_type?: string
+		default_value?: string
+	}>
+	values?: CustomFieldValue[]
+}
+
 const props = defineProps<{
 	taskId: number
 	disabled?: boolean
@@ -111,14 +135,15 @@ async function load() {
 	if (!props.taskId) {
 		return
 	}
-	const {data} = await http.get(`/tasks/${props.taskId}/custom-fields`)
+
+	const {data} = await http.get<CustomFieldsResponse>(`/tasks/${props.taskId}/custom-fields`)
 	schemas.value = (data.schemas || []).map(schema => ({
 		...schema,
 		fieldType: schema.field_type ?? schema.fieldType,
 		defaultValue: schema.default_value ?? schema.defaultValue,
 	}))
 
-	const valuesByFieldId = Object.fromEntries((data.values || []).map((value: any) => [
+	const valuesByFieldId = Object.fromEntries((data.values || []).map(value => [
 		value.field_id ?? value.fieldId,
 		value.value,
 	]))
@@ -147,6 +172,7 @@ async function save(schema: Schema) {
 	if (props.disabled) {
 		return
 	}
+
 	const value = schema.fieldType === 'checkbox'
 		? checkboxValues.value[schema.id]
 		: localValues.value[schema.id]

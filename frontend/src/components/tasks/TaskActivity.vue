@@ -31,7 +31,9 @@
 						<strong>{{ displayName(activity) }}</strong>
 						{{ formatAction(activity) }}
 					</div>
-					<div class="activity-date">{{ formatDate(activity.createdAt) }}</div>
+					<div class="activity-date">
+						{{ formatDate(activity.createdAt) }}
+					</div>
 				</div>
 			</li>
 		</ul>
@@ -42,13 +44,16 @@
 import type {ITaskActivity, ITaskActivityChange} from '@/modelTypes/ITaskActivity'
 import TaskActivityService from '@/services/taskActivity'
 
-const props = defineProps<{ taskId: number }>()
+const props = defineProps<{taskId: number}>()
 const activities = ref<ITaskActivity[]>([])
 const loading = ref(false)
 const service = shallowReactive(new TaskActivityService())
 
-watch(() => props.taskId, async (taskId) => {
-	if (!taskId) return
+watch(() => props.taskId, async taskId => {
+	if (!taskId) {
+		return
+	}
+
 	loading.value = true
 	try {
 		activities.value = await service.getAll({taskId})
@@ -66,9 +71,15 @@ function formatFieldLabel(field: string) {
 }
 
 function printable(value: unknown) {
-	if (value === null || typeof value === 'undefined' || value === '') return 'empty'
-	if (Array.isArray(value)) return value.join(', ')
-	if (typeof value === 'object') return JSON.stringify(value)
+	if (value === null || typeof value === 'undefined' || value === '') {
+		return 'empty'
+	}
+	if (Array.isArray(value)) {
+		return value.join(', ')
+	}
+	if (typeof value === 'object') {
+		return JSON.stringify(value)
+	}
 	return String(value)
 }
 
@@ -79,14 +90,20 @@ function firstChange(activity: ITaskActivity): [string, ITaskActivityChange] | n
 
 function formatAction(activity: ITaskActivity) {
 	const change = firstChange(activity)
-	if (activity.action === 'created') return 'created the task'
+	if (activity.action === 'created') {
+		return 'created the task'
+	}
 	if (activity.action === 'custom_field_changed' && change) {
 		const [field, values] = change
 		return `changed ${formatFieldLabel(field)}: "${printable(values.old)}" → "${printable(values.new)}"`
 	}
 	if (activity.action === 'commented' && change?.[0] === 'comment') {
-		if (change[1].old == null && change[1].new != null) return 'added a comment'
-		if (change[1].old != null && change[1].new == null) return 'deleted a comment'
+		if (change[1].old == null && change[1].new != null) {
+			return 'added a comment'
+		}
+		if (change[1].old != null && change[1].new == null) {
+			return 'deleted a comment'
+		}
 		return 'edited a comment'
 	}
 	if (change) {
@@ -97,7 +114,9 @@ function formatAction(activity: ITaskActivity) {
 }
 
 function formatDate(value: Date | string | null) {
-	if (!value) return ''
+	if (!value) {
+		return ''
+	}
 	const date = value instanceof Date ? value : new Date(value)
 	return new Intl.DateTimeFormat('pt-BR', {
 		day: '2-digit',

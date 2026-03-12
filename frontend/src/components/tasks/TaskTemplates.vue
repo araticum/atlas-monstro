@@ -1,18 +1,30 @@
 <template>
 	<div class="task-templates details content">
 		<h3>
-			<span class="icon is-grey"><Icon icon="clone" /></span>
-			{{ $t("task.templates.title") }}
+			<span class="icon is-grey">
+				<Icon icon="clone" />
+			</span>
+			{{ $t('task.templates.title') }}
 		</h3>
 
-		<p v-if="!loading && templates.length === 0" class="has-text-grey">
-			{{ $t("task.templates.empty") }}
+		<p
+			v-if="!loading && templates.length === 0"
+			class="has-text-grey"
+		>
+			{{ $t('task.templates.empty') }}
 		</p>
 
-		<div v-for="template in templates" :key="template.id" class="template-card">
+		<div
+			v-for="template in templates"
+			:key="template.id"
+			class="template-card"
+		>
 			<div>
 				<strong>{{ template.title }}</strong>
-				<p v-if="template.description" class="template-description">
+				<p
+					v-if="template.description"
+					class="template-description"
+				>
 					{{ template.description }}
 				</p>
 			</div>
@@ -22,64 +34,65 @@
 				:loading="loadingTemplateId === template.id"
 				@click="useTemplate(template.id)"
 			>
-				{{ $t("task.templates.use") }}
+				{{ $t('task.templates.use') }}
 			</XButton>
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch } from "vue";
-import { useI18n } from "vue-i18n";
+import {onMounted, ref, watch} from 'vue'
+import {useI18n} from 'vue-i18n'
 
-import type { ITask } from "@/modelTypes/ITask";
-import TaskTemplateService from "@/services/taskTemplate";
-import { success } from "@/message";
+import type {ITask} from '@/modelTypes/ITask'
+import TaskTemplateService from '@/services/taskTemplate'
+import {success} from '@/message'
 
 const props = defineProps<{
-	projectId: ITask["projectId"];
-	currentTaskId?: ITask["id"];
-}>();
+	projectId: ITask['projectId']
+	currentTaskId?: ITask['id']
+}>()
 
 const emit = defineEmits<{
-	(e: "task-created", task: ITask): void;
-}>();
+	(e: 'taskCreated', task: ITask): void
+}>()
 
-const { t } = useI18n({ useScope: "global" });
-const service = new TaskTemplateService();
-const templates = ref<ITask[]>([]);
-const loading = ref(false);
-const loadingTemplateId = ref<number | null>(null);
+const {t} = useI18n({useScope: 'global'})
+const service = new TaskTemplateService()
+const templates = ref<ITask[]>([])
+const loading = ref(false)
+const loadingTemplateId = ref<number | null>(null)
 
 async function loadTemplates() {
-	if (!props.projectId) return;
-	loading.value = true;
+	if (!props.projectId) {
+		return
+	}
+
+	loading.value = true
 	try {
 		const loaded = await service.getAll({
 			projectId: props.projectId,
-		} as ITask);
-		templates.value = loaded.filter(
-			(template) => template.id !== props.currentTaskId,
-		);
+		} as ITask)
+		templates.value = loaded.filter(template => template.id !== props.currentTaskId)
 	} finally {
-		loading.value = false;
+		loading.value = false
 	}
 }
 
 async function useTemplate(templateId: number) {
-	loadingTemplateId.value = templateId;
+	loadingTemplateId.value = templateId
 	try {
-		const task = await service.duplicate(props.projectId, templateId);
-		success({ message: t("task.templates.createdSuccess") });
-		emit("task-created", task);
-		await loadTemplates();
+		const task = await service.duplicate(props.projectId, templateId)
+		success({message: t('task.templates.createdSuccess')})
+		emit('taskCreated', task)
+		await loadTemplates()
 	} finally {
-		loadingTemplateId.value = null;
+		loadingTemplateId.value = null
 	}
 }
 
-watch(() => [props.projectId, props.currentTaskId], loadTemplates);
-onMounted(loadTemplates);
+watch(() => [props.projectId, props.currentTaskId], loadTemplates)
+onMounted(loadTemplates)
 </script>
 
 <style scoped lang="scss">
