@@ -435,6 +435,8 @@ func registerAPIRoutes(a *echo.Group) {
 	a.GET("/projects/:project/field-schemas", apiv1.ListTaskFieldSchemas)
 	a.POST("/projects/:project/field-schemas", apiv1.CreateTaskFieldSchema)
 	a.DELETE("/projects/:project/field-schemas/:schema", apiv1.DeleteTaskFieldSchema)
+	a.GET("/projects/:project/task-templates", apiv1.ListProjectTaskTemplates)
+	a.POST("/projects/:project/task-templates/:template/duplicate", apiv1.DuplicateTaskTemplate)
 
 	if config.ServiceEnableLinkSharing.GetBool() {
 		projectSharingHandler := &handler.WebHandler{
@@ -483,6 +485,7 @@ func registerAPIRoutes(a *echo.Group) {
 	a.GET("/tasks", taskCollectionHandler.ReadAllWeb)
 	a.DELETE("/tasks/:projecttask", taskHandler.DeleteWeb)
 	a.POST("/tasks/:projecttask", taskHandler.UpdateWeb)
+	a.PUT("/tasks/:task/template", apiv1.UpdateTaskTemplate)
 
 	taskDuplicateHandler := &handler.WebHandler{
 		EmptyStruct: func() handler.CObject {
