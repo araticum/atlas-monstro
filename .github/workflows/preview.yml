@@ -27,6 +27,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
         with:
+          fetch-depth: 0
           # For pull_request_target, we need to explicitly fetch the PR ref from forks
           # since the PR's commit SHA is not reachable in the base repository.
           # This is safe because no PR code is executed in workflow context.

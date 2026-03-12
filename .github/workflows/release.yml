@@ -7,6 +7,9 @@ jobs:
   docker:
     runs-on: namespace-profile-default
     steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+        with:
+          fetch-depth: 0
       - name: Git describe
         id: ghd
         uses: proudust/gh-describe@v2
@@ -58,6 +61,8 @@ jobs:
     runs-on: blacksmith-8vcpu-ubuntu-2204
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+        with:
+          fetch-depth: 0
       - name: Git describe
         id: ghd
         uses: proudust/gh-describe@v2
@@ -153,6 +158,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+        with:
+          fetch-depth: 0
       - name: Download Vikunja Binary
         uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
         with:
@@ -203,6 +210,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+        with:
+          fetch-depth: 0
       - name: Git describe
         id: ghd
         uses: proudust/gh-describe@v2
@@ -236,6 +245,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+        with:
+          fetch-depth: 0
       - name: Git describe
         id: ghd
         uses: proudust/gh-describe@v2

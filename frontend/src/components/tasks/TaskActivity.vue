@@ -138,8 +138,8 @@ function formatDate(value: Date | string | null) {
 }
 .activity-item {
 	position: relative;
-	padding-left: 1rem;
-	border-left: 2px solid var(--grey-200);
+	padding-inline-start: 1rem;
+	border-inline-start: 2px solid var(--grey-200);
 }
 .activity-content {
 	display: flex;

@@ -82,7 +82,7 @@ type Task struct {
 	// The task color in hex
 	HexColor string `xorm:"varchar(6) null" json:"hex_color" valid:"runelength(0|7)" maxLength:"7"`
 	// Whether this task is a reusable template.
-	IsTemplate bool `xorm:"default false" json:"is_template"`
+	IsTemplate bool `xorm:"default false" json:"is_template,omitempty"`
 	// Determines how far a task is left from being done
 	PercentDone float64 `xorm:"DOUBLE null" json:"percent_done"`
 

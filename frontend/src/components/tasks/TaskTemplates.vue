@@ -102,7 +102,7 @@ onMounted(loadTemplates)
 	gap: 1rem;
 	align-items: flex-start;
 	padding: 0.75rem 0;
-	border-bottom: 1px solid var(--grey-200);
+	border-block-end: 1px solid var(--grey-200);
 }
 
 .template-description {
