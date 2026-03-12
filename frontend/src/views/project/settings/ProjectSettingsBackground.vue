@@ -49,7 +49,7 @@
 					v-for="im in backgroundSearchResult"
 					:key="im.id"
 					class="image-search__result-item"
-					:style="{'background-image': `url(${backgroundBlurHashes[im.id]})`}"
+					:style="{'background-image': `url(${backgroundBlurHashes[im.id]})` }"
 				>
 					<CustomTransition name="fade">
 						<BaseButton
@@ -122,13 +122,16 @@ import {useConfigStore} from '@/stores/config'
 import BackgroundUnsplashService from '@/services/backgroundUnsplash'
 import BackgroundUploadService from '@/services/backgroundUpload'
 import ProjectService from '@/services/project'
-import type BackgroundImageModel from '@/models/backgroundImage'
 
 import {getBlobFromBlurHash} from '@/helpers/getBlobFromBlurHash'
 import {useTitle} from '@/composables/useTitle'
 
 import CreateEdit from '@/components/misc/CreateEdit.vue'
 import {success} from '@/message'
+
+import type {IBackgroundImage} from '@/modelTypes/IBackgroundImage'
+import type {IProject} from '@/modelTypes/IProject'
+import type {IFile} from '@/modelTypes/IFile'
 
 defineOptions({name: 'ProjectSettingBackground'})
 
@@ -143,64 +146,64 @@ useTitle(() => t('project.background.title'))
 
 const backgroundService = shallowReactive(new BackgroundUnsplashService())
 const backgroundSearchTerm = ref('')
-const backgroundSearchResult = ref([])
-const backgroundThumbs = ref<Record<string, string>>({})
-const backgroundBlurHashes = ref<Record<string, string>>({})
+const backgroundSearchResult = ref<IBackgroundImage[]>([])
+const backgroundThumbs = ref<Record<number, string>>({})
+const backgroundBlurHashes = ref<Record<number, string>>({})
 const currentPage = ref(1)
 
-// We're using debounce to not search on every keypress but with a delay.
 const debounceNewBackgroundSearch = useDebounceFn(newBackgroundSearch, SEARCH_DEBOUNCE)
 
-const backgroundUploadService = ref(new BackgroundUploadService())
-const projectService = ref(new ProjectService())
+const backgroundUploadService = shallowReactive(new BackgroundUploadService())
+const projectService = shallowReactive(new ProjectService())
 const projectStore = useProjectStore()
 const configStore = useConfigStore()
 
 const unsplashBackgroundEnabled = computed(() => configStore.enabledBackgroundProviders.includes('unsplash'))
 const uploadBackgroundEnabled = computed(() => configStore.enabledBackgroundProviders.includes('upload'))
 const currentProject = computed(() => baseStore.currentProject)
-const hasBackground = computed(() => !!currentProject.value.backgroundInformation)
+const hasBackground = computed(() => !!currentProject.value?.backgroundInformation)
+const projectId = computed(() => Number(route.params.projectId))
 
-// Show the default collection of backgrounds
 newBackgroundSearch()
 
 function newBackgroundSearch() {
 	if (!unsplashBackgroundEnabled.value) {
 		return
 	}
-	// This is an extra method to reset a few things when searching to not break loading more photos.
 	backgroundSearchResult.value = []
 	backgroundThumbs.value = {}
+	backgroundBlurHashes.value = {}
 	searchBackgrounds()
 }
 
 async function searchBackgrounds(page = 1) {
 	currentPage.value = page
-	const result = await backgroundService.getAll({}, {s: backgroundSearchTerm.value, p: page})
+	const result = await backgroundService.getAll({} as unknown as IBackgroundImage, {s: backgroundSearchTerm.value, p: page}) as IBackgroundImage[]
 	backgroundSearchResult.value = backgroundSearchResult.value.concat(result)
-	result.forEach((background: BackgroundImageModel) => {
+	result.forEach((background) => {
 		getBlobFromBlurHash(background.blurHash)
-			.then((b) => {
-				backgroundBlurHashes.value[background.id] = window.URL.createObjectURL(b)
+			.then((blob) => {
+				if (!blob) {
+					return
+				}
+				backgroundBlurHashes.value[background.id] = window.URL.createObjectURL(blob)
 			})
 
-		backgroundService.thumb(background).then(b => {
-			backgroundThumbs.value[background.id] = b
+		backgroundService.thumb(background).then(thumb => {
+			backgroundThumbs.value[background.id] = thumb
 		})
 	})
 }
 
-
-async function setBackground(backgroundId: string) {
-	// Don't set a background if we're in the process of setting one
+async function setBackground(backgroundId: IBackgroundImage['id']) {
 	if (backgroundService.loading) {
 		return
 	}
 
 	const project = await backgroundService.update({
 		id: backgroundId,
-		projectId: route.params.projectId,
-	})
+		projectId: projectId.value,
+	} as unknown as IBackgroundImage) as unknown as IProject
 	await baseStore.handleSetCurrentProject({project, forceUpdate: true})
 	projectStore.setProject(project)
 	success({message: t('project.background.success')})
@@ -208,21 +211,23 @@ async function setBackground(backgroundId: string) {
 
 const backgroundUploadInput = ref<HTMLInputElement | null>(null)
 async function uploadBackground() {
-	if (backgroundUploadInput.value?.files?.length === 0) {
+	const file = backgroundUploadInput.value?.files?.[0]
+	if (!file) {
 		return
 	}
 
-	const project = await backgroundUploadService.value.create(
-		route.params.projectId,
-		backgroundUploadInput.value?.files[0],
-	)
+	const project = await backgroundUploadService.create(projectId.value, file as unknown as IFile) as unknown as IProject
 	await baseStore.handleSetCurrentProject({project, forceUpdate: true})
 	projectStore.setProject(project)
 	success({message: t('project.background.success')})
 }
 
 async function removeBackground() {
-	const project = await projectService.value.removeBackground(currentProject.value)
+	if (!currentProject.value) {
+		return
+	}
+
+	const project = await projectService.removeBackground(currentProject.value as IProject)
 	await baseStore.handleSetCurrentProject({project, forceUpdate: true})
 	projectStore.setProject(project)
 	success({message: t('project.background.removeSuccess')})

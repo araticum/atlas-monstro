@@ -27,41 +27,81 @@ const emit = defineEmits<{
 	'cancel': [],
 }>()
 
-const view = ref<IProjectView>()
+const view = ref<IProjectView | null>(null)
 
 const labelStore = useLabelStore()
 const projectStore = useProjectStore()
 
-onBeforeMount(() => {
-	const transformFilterFromApi = (filterInput: IFilters): IFilter => {
-		const filterString = transformFilterStringFromApi(
-			filterInput.filter,
-			labelId => labelStore.getLabelById(labelId)?.title || null,
-			projectId => projectStore.projects[projectId]?.title || null,
-		)
-		
-		const filter: IFilters = {
-			filter: '',
-			s: '',
-		}
-		if (hasFilterQuery(filterString)) {
-			filter.filter = filterString
-		} else {
-			filter.s = filterString
-		}
-		
-		if (filter.s === '') {
-			filter.s = filterInput.s
-		}
-		
-		if (filter.filter === '') {
-			filter.filter = filter.s
-		}
+function createEmptyFilters(): IFilters {
+	return {
+		sort_by: [],
+		order_by: [],
+		filter: '',
+		filter_include_nulls: false,
+		s: '',
+	}
+}
 
-		return filter
+function transformFilterFromApi(filterInput?: IFilters): IFilters {
+	if (!filterInput) {
+		return createEmptyFilters()
 	}
 
-	const transformed = {
+	const filterString = transformFilterStringFromApi(
+		filterInput.filter,
+		labelId => labelStore.getLabelById(labelId)?.title || null,
+		projectId => projectStore.projects[projectId]?.title || null,
+	)
+
+	const filter = {
+		...createEmptyFilters(),
+		sort_by: filterInput.sort_by,
+		order_by: filterInput.order_by,
+		filter_include_nulls: filterInput.filter_include_nulls,
+	}
+
+	if (hasFilterQuery(filterString)) {
+		filter.filter = filterString
+	} else {
+		filter.s = filterString
+	}
+
+	if (filter.s === '') {
+		filter.s = filterInput.s
+	}
+
+	if (filter.filter === '') {
+		filter.filter = filter.s
+	}
+
+	return filter
+}
+
+function transformFilterForApi(filterQuery: string, currentFilter?: IFilters): IFilters {
+	const filterString = transformFilterStringForApi(
+		filterQuery,
+		labelTitle => labelStore.getLabelByExactTitle(labelTitle)?.id || null,
+		projectTitle => projectStore.findProjectByExactname(projectTitle)?.id || null,
+	)
+
+	const filter = {
+		...createEmptyFilters(),
+		...currentFilter,
+		filter: '',
+		s: '',
+	}
+
+	if (hasFilterQuery(filterString)) {
+		filter.filter = filterString
+	} else {
+		filter.s = filterString
+	}
+
+	return filter
+}
+
+onBeforeMount(() => {
+	const transformed: IProjectView = {
 		...props.modelValue,
 		filter: transformFilterFromApi(props.modelValue.filter),
 		bucketConfiguration: props.modelValue.bucketConfiguration.map(bc => ({
@@ -76,31 +116,16 @@ onBeforeMount(() => {
 })
 
 function save() {
-	const transformFilterForApi = (filterQuery: string): IFilters => {
-		const filterString = transformFilterStringForApi(
-			filterQuery,
-			labelTitle => labelStore.getLabelByExactTitle(labelTitle)?.id || null,
-			projectTitle => {
-				const found = projectStore.findProjectByExactname(projectTitle)
-				return found?.id || null
-			},
-		)
-		const filter: IFilters = {}
-		if (hasFilterQuery(filterString)) {
-			filter.filter = filterString
-		} else {
-			filter.s = filterString
-		}
-
-		return filter
+	if (!view.value) {
+		return
 	}
 
 	emit('update:modelValue', {
 		...view.value,
-		filter: transformFilterForApi(view.value?.filter?.filter || ''),
-		bucketConfiguration: view.value?.bucketConfiguration.map(bc => ({
+		filter: transformFilterForApi(view.value.filter?.filter || '', view.value.filter),
+		bucketConfiguration: view.value.bucketConfiguration.map(bc => ({
 			title: bc.title,
-			filter: transformFilterForApi(bc.filter?.filter || ''),
+			filter: transformFilterForApi(bc.filter?.filter || '', bc.filter),
 		})),
 	})
 }
@@ -118,10 +143,19 @@ function handleBubbleSave() {
 
 	save()
 }
+
+function removeBucket(index: number) {
+	view.value?.bucketConfiguration.splice(index, 1)
+}
+
+function addBucket() {
+	view.value?.bucketConfiguration.push({title: '', filter: createEmptyFilters()})
+}
 </script>
 
 <template>
 	<form
+		v-if="view"
 		@focusout="handleBubbleSave"
 		@submit.prevent="save"
 	>
@@ -166,6 +200,7 @@ function handleBubbleSave() {
 			{{ $t('project.views.filter') }}
 		</label>
 		<FilterInput
+			v-if="view.filter"
 			id="filter"
 			v-model="view.filter.filter"
 			:project-id="view.projectId"
@@ -226,7 +261,7 @@ function handleBubbleSave() {
 				>
 					<button
 						class="is-danger"
-						@click.prevent="() => view.bucketConfiguration.splice(index, 1)"
+						@click.prevent="removeBucket(index)"
 					>
 						<Icon icon="trash-alt" />
 					</button>
@@ -254,7 +289,7 @@ function handleBubbleSave() {
 					<XButton
 						variant="secondary"
 						icon="plus"
-						@click="() => view.bucketConfiguration.push({title: '', filter: {filter: ''}})"
+						@click="addBucket"
 					>
 						{{ $t('project.kanban.addBucket') }}
 					</XButton>

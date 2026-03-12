@@ -5,7 +5,7 @@
 		</Message>
 
 		<Message v-else-if="avatarProvider === 'openid'">
-			{{ $t('user.settings.avatar.openid', {provider: authStore.info.authProvider}) }}
+			{{ $t('user.settings.avatar.openid', {provider: authProvider}) }}
 		</Message>
 
 		<template v-else>
@@ -37,7 +37,7 @@
 				<XButton
 					v-if="!isCropAvatar"
 					:loading="avatarService.loading || loading"
-					@click="avatarUploadInput.click()"
+					@click="avatarUploadInput?.click()"
 				>
 					{{ $t('user.settings.avatar.uploadAvatar') }}
 				</XButton>
@@ -89,12 +89,16 @@ import {success} from '@/message'
 import {useAuthStore} from '@/stores/auth'
 import Message from '@/components/misc/Message.vue'
 
+import type {AvatarProvider, IAvatar} from '@/modelTypes/IAvatar'
+
+
 defineOptions({name: 'UserSettingsAvatar'})
 
 const {t} = useI18n({useScope: 'global'})
 const authStore = useAuthStore()
+const authProvider = computed(() => ((authStore.info as ({authProvider?: string} & typeof authStore.info) | null)?.authProvider) ?? '')
 
-const AVATAR_PROVIDERS = computed(() => ({
+const AVATAR_PROVIDERS = computed<Record<AvatarProvider, string>>(() => ({
 	default: t('misc.default'),
 	initials: t('user.settings.avatar.initials'),
 	gravatar: t('user.settings.avatar.gravatar'),
@@ -105,32 +109,31 @@ const AVATAR_PROVIDERS = computed(() => ({
 useTitle(() => `${t('user.settings.avatar.title')} - ${t('user.settings.title')}`)
 
 const avatarService = shallowReactive(new AvatarService())
-// Separate variable because some things we're doing in browser take a bit
 const loading = ref(false)
-
-
-const avatarProvider = ref('')
+const avatarProvider = ref<AvatarProvider | 'ldap' | 'openid'>('default')
 
 async function avatarStatus() {
-	const {avatarProvider: currentProvider} = await avatarService.get({})
-	avatarProvider.value = currentProvider
+	const currentAvatar = await avatarService.get(new AvatarModel({}) as IAvatar)
+	avatarProvider.value = currentAvatar.avatarProvider
 }
 
 avatarStatus()
 
-
 async function updateAvatarStatus() {
-	await avatarService.update(new AvatarModel({avatarProvider: avatarProvider.value}))
+	await avatarService.update(new AvatarModel({avatarProvider: avatarProvider.value as AvatarProvider}))
 	success({message: t('user.settings.avatar.statusUpdateSuccess')})
 	authStore.reloadAvatar()
 }
 
-const cropper = ref()
+type CropperResult = { canvas?: HTMLCanvasElement | null }
+type CropperLike = { getResult: () => CropperResult }
+
+const cropper = ref<CropperLike | null>(null)
 const isCropAvatar = ref(false)
 
 async function uploadAvatar() {
 	loading.value = true
-	const {canvas} = cropper.value.getResult()
+	const {canvas} = cropper.value?.getResult() ?? {}
 
 	if (!canvas) {
 		loading.value = false
@@ -138,7 +141,10 @@ async function uploadAvatar() {
 	}
 
 	try {
-		const blob = await new Promise(resolve => canvas.toBlob(blob => resolve(blob)))
+		const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob((canvasBlob: Blob | null) => resolve(canvasBlob)))
+		if (!blob) {
+			return
+		}
 		await avatarService.create(blob)
 		success({message: t('user.settings.avatar.setSuccess')})
 		authStore.reloadAvatar()
@@ -148,25 +154,24 @@ async function uploadAvatar() {
 	}
 }
 
-const avatarToCrop = ref()
-const avatarUploadInput = ref()
+const avatarToCrop = ref<string>('')
+const avatarUploadInput = ref<HTMLInputElement | null>(null)
 
 function cropAvatar() {
-	const avatar = avatarUploadInput.value.files
-
-	if (avatar.length === 0) {
+	const avatar = avatarUploadInput.value?.files
+	if (!avatar || avatar.length === 0) {
 		return
 	}
 
 	loading.value = true
 	const reader = new FileReader()
-	reader.onload = e => {
-		avatarToCrop.value = e.target.result
-		isCropAvatar.value = true
-		// Note: loading stays true until Cropper's @ready event fires
-		// This ensures the canvas is ready before allowing upload
+	reader.onload = (e: ProgressEvent<FileReader>) => {
+		avatarToCrop.value = typeof e.target?.result === 'string' ? e.target.result : ''
+		isCropAvatar.value = avatarToCrop.value !== ''
 	}
-	reader.onerror = () => loading.value = false
+	reader.onerror = () => {
+		loading.value = false
+	}
 	reader.readAsDataURL(avatar[0])
 }
 </script>

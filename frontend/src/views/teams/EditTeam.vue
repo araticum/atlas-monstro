@@ -4,7 +4,7 @@
 		:class="{ 'is-loading': teamService.loading }"
 	>
 		<Card
-			v-if="userIsAdmin && !team.oidcId"
+			v-if="team && userIsAdmin && !teamOidcId"
 			class="is-fullwidth"
 			:title="title"
 		>
@@ -65,12 +65,13 @@
 		</Card>
 
 		<Card
+			v-if="team"
 			class="is-fullwidth has-overflow"
 			:title="$t('team.edit.members')"
 			:padding="false"
 		>
 			<form
-				v-if="userIsAdmin && !team.oidcId"
+				v-if="userIsAdmin && !teamOidcId"
 				class="p-4"
 				@submit.prevent="addUser"
 			>
@@ -86,6 +87,7 @@
 						>
 							<template #searchResult="{option: user}">
 								<User
+									v-if="isUserOption(user)"
 									:avatar-size="24"
 									:user="user"
 									class="m-0"
@@ -113,7 +115,7 @@
 				<table class="table has-actions is-striped is-hoverable is-fullwidth">
 					<tbody>
 						<tr
-							v-for="m in team?.members"
+							v-for="m in team.members"
 							:key="m.id"
 						>
 							<td>
@@ -124,7 +126,7 @@
 								/>
 							</td>
 							<td>
-								<template v-if="m.id === userInfo.id">
+								<template v-if="m.id === userInfo?.id">
 									<b class="is-success">You</b>
 								</template>
 							</td>
@@ -147,7 +149,7 @@
 								class="actions"
 							>
 								<XButton
-									v-if="m.id !== userInfo.id"
+									v-if="m.id !== userInfo?.id"
 									:loading="teamMemberService.loading"
 									class="mie-2"
 									@click="() => toggleUserType(m)"
@@ -155,7 +157,7 @@
 									{{ m.admin ? $t('team.edit.makeMember') : $t('team.edit.makeAdmin') }}
 								</XButton>
 								<XButton
-									v-if="m.id !== userInfo.id"
+									v-if="m.id !== userInfo?.id"
 									:loading="teamMemberService.loading"
 									danger
 									icon="trash-alt"
@@ -176,7 +178,6 @@
 			{{ $t('team.edit.leave.title') }}
 		</XButton>
 
-		<!-- Leave team modal -->
 		<Modal
 			v-if="showLeaveModal"
 			@close="showLeaveModal = false"
@@ -194,7 +195,6 @@
 			</template>
 		</Modal>
 
-		<!-- Team delete modal -->
 		<Modal
 			:enabled="showDeleteModal"
 			@close="showDeleteModal = false"
@@ -212,7 +212,6 @@
 			</template>
 		</Modal>
 
-		<!-- User delete modal -->
 		<Modal
 			:enabled="showUserDeleteModal"
 			@close="showUserDeleteModal = false"
@@ -243,6 +242,7 @@ import FormField from '@/components/input/FormField.vue'
 import Multiselect from '@/components/input/Multiselect.vue'
 import User from '@/components/misc/User.vue'
 
+import TeamMemberModel from '@/models/teamMember'
 import TeamService from '@/services/team'
 import TeamMemberService from '@/services/teamMember'
 import UserService from '@/services/user'
@@ -258,30 +258,31 @@ import type {ITeam} from '@/modelTypes/ITeam'
 import type {IUser} from '@/modelTypes/IUser'
 import type {ITeamMember} from '@/modelTypes/ITeamMember'
 
+type SearchUser = IUser & Record<string, unknown>
+
 const authStore = useAuthStore()
 const configStore = useConfigStore()
 const route = useRoute()
 const router = useRouter()
 const {t} = useI18n({useScope: 'global'})
 
-const userIsAdmin = computed(() => {
-	return (
-		team.value &&
-		team.value.maxPermission &&
-		team.value.maxPermission > Permissions.READ
-	)
-})
+const team = ref<ITeam | null>(null)
+const teamOidcId = computed(() => Boolean((team.value as (ITeam & {oidcId?: string | null}) | null)?.oidcId))
+const userIsAdmin = computed(() => (
+	team.value !== null &&
+	team.value.maxPermission !== null &&
+	team.value.maxPermission > Permissions.READ
+))
 const userInfo = computed(() => authStore.info)
 
-const teamService = ref<TeamService>(new TeamService())
-const teamMemberService = ref<TeamMemberService>(new TeamMemberService())
-const userService = ref<UserService>(new UserService())
+const teamService = ref(new TeamService())
+const teamMemberService = ref(new TeamMemberService())
+const userService = ref(new UserService())
 
-const team = ref<ITeam>()
 const teamId = computed(() => Number(route.params.id))
-const memberToDelete = ref<ITeamMember>()
-const newMember = ref<IUser>()
-const foundUsers = ref<IUser[]>()
+const memberToDelete = ref<ITeamMember | null>(null)
+const newMember = ref<SearchUser | null>(null)
+const foundUsers = ref<SearchUser[]>([])
 
 const showDeleteModal = ref(false)
 const showUserDeleteModal = ref(false)
@@ -294,13 +295,14 @@ const title = ref('')
 loadTeam()
 
 async function loadTeam() {
-	team.value = await teamService.value.get({id: teamId.value})
+	team.value = await teamService.value.get({id: teamId.value} as ITeam)
 	title.value = t('team.edit.title', {team: team.value?.name})
 	useTitle(() => title.value)
 }
 
 async function save() {
-	if (team.value?.name === '') {
+	if (!team.value) return
+	if (team.value.name === '') {
 		showErrorTeamnameRequired.value = true
 		return
 	}
@@ -311,21 +313,24 @@ async function save() {
 }
 
 async function deleteTeam() {
+	if (!team.value) return
 	await teamService.value.delete(team.value)
 	success({message: t('team.edit.delete.success')})
 	router.push({name: 'teams.index'})
 }
 
 async function deleteMember() {
+	if (!memberToDelete.value) return
 	try {
-		await teamMemberService.value.delete({
+		await teamMemberService.value.delete(new TeamMemberModel({
 			teamId: teamId.value,
 			username: memberToDelete.value.username,
-		})
+		}))
 		success({message: t('team.edit.deleteUser.success')})
 		await loadTeam()
 	} finally {
 		showUserDeleteModal.value = false
+		memberToDelete.value = null
 	}
 }
 
@@ -335,31 +340,33 @@ async function addUser() {
 		showMustSelectUserError.value = true
 		return
 	}
-	await teamMemberService.value.create({
+	await teamMemberService.value.create(new TeamMemberModel({
 		teamId: teamId.value,
 		username: newMember.value.username,
-	})
+	}))
 	newMember.value = null
 	await loadTeam()
 	success({message: t('team.edit.userAddedSuccess')})
 }
 
 async function toggleUserType(member: ITeamMember) {
-	// FIXME: direct manipulation
+	if (!team.value) return
 	member.admin = !member.admin
 	member.teamId = teamId.value
 	const r = await teamMemberService.value.update(member)
-	for (const tm in team.value.members) {
-		if (team.value.members[tm].id === member.id) {
-			team.value.members[tm].admin = r.admin
+	for (const tm of team.value.members) {
+		if (tm.id === member.id) {
+			tm.admin = r.admin
 			break
 		}
 	}
 	success({
-		message: member.admin ?
-			t('team.edit.madeAdmin') :
-			t('team.edit.madeMember'),
+		message: member.admin ? t('team.edit.madeAdmin') : t('team.edit.madeMember'),
 	})
+}
+
+function isUserOption(option: string | SearchUser): option is SearchUser {
+	return typeof option !== 'string'
 }
 
 async function findUser(query: string) {
@@ -368,20 +375,21 @@ async function findUser(query: string) {
 		return
 	}
 
-	const users = await userService.value.getAll({}, {s: query})
-	foundUsers.value = users.filter((u: IUser) => u.id !== userInfo.value.id)
+	const users = await userService.value.getAll({} as IUser, {s: query})
+	foundUsers.value = users.filter((u: IUser) => u.id !== userInfo.value?.id) as SearchUser[]
 }
 
 async function leave() {
+	if (!userInfo.value) return
 	try {
-		await teamMemberService.value.delete({
+		await teamMemberService.value.delete(new TeamMemberModel({
 			teamId: teamId.value,
 			username: userInfo.value.username,
-		})
+		}))
 		success({message: t('team.edit.leave.success')})
 		await router.push({name: 'home'})
 	} finally {
-		showUserDeleteModal.value = false
+		showLeaveModal.value = false
 	}
 }
 </script>
