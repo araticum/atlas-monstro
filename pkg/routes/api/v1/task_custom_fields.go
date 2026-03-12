@@ -2,6 +2,7 @@ package v1
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -115,11 +116,20 @@ func PutTaskCustomFieldValue(c *echo.Context) error {
 		return err
 	}
 	if has {
+		oldValue := existing.Value
 		existing.Value = valueString
 		_, err = s.ID(existing.ID).Cols("value").Update(existing)
 		if err != nil {
 			_ = s.Rollback()
 			return err
+		}
+		if authUser, err := models.GetUserOrLinkShareUser(s, a); err == nil && authUser != nil {
+			if err := models.RecordTaskActivity(s, taskID, authUser.ID, "custom_field_changed", map[string]models.TaskActivityFieldChange{
+				fmt.Sprintf("custom_field_%d", schemaID): {Old: oldValue, New: valueString},
+			}); err != nil {
+				_ = s.Rollback()
+				return err
+			}
 		}
 		if err := s.Commit(); err != nil {
 			_ = s.Rollback()
@@ -134,6 +144,14 @@ func PutTaskCustomFieldValue(c *echo.Context) error {
 		_ = s.Rollback()
 		return err
 	}
+	if authUser, err := models.GetUserOrLinkShareUser(s, a); err == nil && authUser != nil {
+		if err := models.RecordTaskActivity(s, taskID, authUser.ID, "custom_field_changed", map[string]models.TaskActivityFieldChange{
+			fmt.Sprintf("custom_field_%d", schemaID): {Old: nil, New: valueString},
+		}); err != nil {
+			_ = s.Rollback()
+			return err
+		}
+		}
 	if err := s.Commit(); err != nil {
 		_ = s.Rollback()
 		return err
@@ -180,6 +198,14 @@ func DeleteTaskCustomFieldValue(c *echo.Context) error {
 	if _, err = s.ID(value.ID).Delete(&models.TaskCustomFieldValue{}); err != nil {
 		_ = s.Rollback()
 		return err
+	}
+	if authUser, err := models.GetUserOrLinkShareUser(s, a); err == nil && authUser != nil {
+		if err := models.RecordTaskActivity(s, taskID, authUser.ID, "custom_field_changed", map[string]models.TaskActivityFieldChange{
+			fmt.Sprintf("custom_field_%d", schemaID): {Old: value.Value, New: nil},
+		}); err != nil {
+			_ = s.Rollback()
+			return err
+		}
 	}
 	if err := s.Commit(); err != nil {
 		_ = s.Rollback()

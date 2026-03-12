@@ -506,6 +506,7 @@ func registerAPIRoutes(a *echo.Group) {
 	}
 	a.POST("/tasks/:task/position", taskPositionHandler.UpdateWeb)
 	a.GET("/tasks/:task/custom-fields", apiv1.GetTaskCustomFields)
+	a.GET("/tasks/:task/activities", apiv1.GetTaskActivities)
 	a.PUT("/tasks/:task/custom-fields/:schema", apiv1.PutTaskCustomFieldValue)
 	a.DELETE("/tasks/:task/custom-fields/:schema", apiv1.DeleteTaskCustomFieldValue)
 

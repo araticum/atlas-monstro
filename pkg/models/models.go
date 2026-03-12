@@ -72,6 +72,7 @@ func GetTables() []interface{} {
 		&Session{},
 		&TaskFieldSchema{},
 		&TaskCustomFieldValue{},
+		&TaskActivity{},
 	}
 }
 
