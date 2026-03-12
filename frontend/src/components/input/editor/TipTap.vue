@@ -138,6 +138,14 @@
 		>
 			{{ $t('misc.save') }}
 		</XButton>
+
+		<div
+			v-if="editor && isEditing"
+			class="tiptap__editor-meta"
+		>
+			<span>{{ editor.storage.characterCount.characters() }} chars</span>
+			<span>{{ editor.storage.characterCount.words() }} words</span>
+		</div>
 	</div>
 </template>
 
@@ -157,7 +165,13 @@ import {BubbleMenu} from '@tiptap/vue-3/menus'
 
 import Link from '@tiptap/extension-link'
 import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight'
-import {Table, TableRow, TableCell, TableHeader} from '@tiptap/extension-table'
+import Table from '@tiptap/extension-table'
+import TableRow from '@tiptap/extension-table-row'
+import TableCell from '@tiptap/extension-table-cell'
+import TableHeader from '@tiptap/extension-table-header'
+import TextAlign from '@tiptap/extension-text-align'
+import HorizontalRule from '@tiptap/extension-horizontal-rule'
+import CharacterCount from '@tiptap/extension-character-count'
 import Typography from '@tiptap/extension-typography'
 import Image from '@tiptap/extension-image'
 import Underline from '@tiptap/extension-underline'
@@ -401,6 +415,8 @@ const PasteHandler = Extension.create({
 
 						const html = marked.parse(text)
 
+						// Para testar: copie uma tabela do Excel/Google Sheets e cole no editor.
+						// Se a origem expuser HTML de tabela no clipboard, o TipTap deve preservar linhas, colunas e conteúdo.
 						this.editor.commands.insertContent(html)
 						return true
 					},
@@ -416,6 +432,7 @@ const extensions : Extensions = [
 	StarterKit.configure({
 		codeBlock: false,
 		hardBreak: false,
+		horizontalRule: false,
 	}),
 
 	CodeBlockLowlight.configure({
@@ -446,6 +463,11 @@ const extensions : Extensions = [
 	}),
 	Typography,
 	Underline,
+	HorizontalRule,
+	TextAlign.configure({
+		types: ['heading', 'paragraph'],
+	}),
+	CharacterCount,
 	NonInclusiveLink.configure({
 		openOnClick: false,
 		validate: (href) => (new RegExp(

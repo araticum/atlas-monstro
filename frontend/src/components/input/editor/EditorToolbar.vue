@@ -261,98 +261,98 @@
 				</BaseButton>
 				<BaseButton
 					class="editor-toolbar__button"
-					:disabled="!editor.can().addColumnBefore"
+					:disabled="!editor.can().chain().focus().addColumnBefore().run()"
 					@click="editor.chain().focus().addColumnBefore().run()"
 				>
 					{{ $t('input.editor.table.addColumnBefore') }}
 				</BaseButton>
 				<BaseButton
 					class="editor-toolbar__button"
-					:disabled="!editor.can().addColumnAfter"
+					:disabled="!editor.can().chain().focus().addColumnAfter().run()"
 					@click="editor.chain().focus().addColumnAfter().run()"
 				>
 					{{ $t('input.editor.table.addColumnAfter') }}
 				</BaseButton>
 				<BaseButton
 					class="editor-toolbar__button"
-					:disabled="!editor.can().deleteColumn"
+					:disabled="!editor.can().chain().focus().deleteColumn().run()"
 					@click="editor.chain().focus().deleteColumn().run()"
 				>
 					{{ $t('input.editor.table.deleteColumn') }}
 				</BaseButton>
 				<BaseButton
 					class="editor-toolbar__button"
-					:disabled="!editor.can().addRowBefore"
+					:disabled="!editor.can().chain().focus().addRowBefore().run()"
 					@click="editor.chain().focus().addRowBefore().run()"
 				>
 					{{ $t('input.editor.table.addRowBefore') }}
 				</BaseButton>
 				<BaseButton
 					class="editor-toolbar__button"
-					:disabled="!editor.can().addRowAfter"
+					:disabled="!editor.can().chain().focus().addRowAfter().run()"
 					@click="editor.chain().focus().addRowAfter().run()"
 				>
 					{{ $t('input.editor.table.addRowAfter') }}
 				</BaseButton>
 				<BaseButton
 					class="editor-toolbar__button"
-					:disabled="!editor.can().deleteRow"
+					:disabled="!editor.can().chain().focus().deleteRow().run()"
 					@click="editor.chain().focus().deleteRow().run()"
 				>
 					{{ $t('input.editor.table.deleteRow') }}
 				</BaseButton>
 				<BaseButton
 					class="editor-toolbar__button"
-					:disabled="!editor.can().deleteTable"
+					:disabled="!editor.can().chain().focus().deleteTable().run()"
 					@click="editor.chain().focus().deleteTable().run()"
 				>
 					{{ $t('input.editor.table.deleteTable') }}
 				</BaseButton>
 				<BaseButton
 					class="editor-toolbar__button"
-					:disabled="!editor.can().mergeCells"
+					:disabled="!editor.can().chain().focus().mergeCells().run()"
 					@click="editor.chain().focus().mergeCells().run()"
 				>
 					{{ $t('input.editor.table.mergeCells') }}
 				</BaseButton>
 				<BaseButton
 					class="editor-toolbar__button"
-					:disabled="!editor.can().splitCell"
+					:disabled="!editor.can().chain().focus().splitCell().run()"
 					@click="editor.chain().focus().splitCell().run()"
 				>
 					{{ $t('input.editor.table.splitCell') }}
 				</BaseButton>
 				<BaseButton
 					class="editor-toolbar__button"
-					:disabled="!editor.can().toggleHeaderColumn"
+					:disabled="!editor.can().chain().focus().toggleHeaderColumn().run()"
 					@click="editor.chain().focus().toggleHeaderColumn().run()"
 				>
 					{{ $t('input.editor.table.toggleHeaderColumn') }}
 				</BaseButton>
 				<BaseButton
 					class="editor-toolbar__button"
-					:disabled="!editor.can().toggleHeaderRow"
+					:disabled="!editor.can().chain().focus().toggleHeaderRow().run()"
 					@click="editor.chain().focus().toggleHeaderRow().run()"
 				>
 					{{ $t('input.editor.table.toggleHeaderRow') }}
 				</BaseButton>
 				<BaseButton
 					class="editor-toolbar__button"
-					:disabled="!editor.can().toggleHeaderCell"
+					:disabled="!editor.can().chain().focus().toggleHeaderCell().run()"
 					@click="editor.chain().focus().toggleHeaderCell().run()"
 				>
 					{{ $t('input.editor.table.toggleHeaderCell') }}
 				</BaseButton>
 				<BaseButton
 					class="editor-toolbar__button"
-					:disabled="!editor.can().mergeOrSplit"
+					:disabled="!editor.can().chain().focus().mergeOrSplit().run()"
 					@click="editor.chain().focus().mergeOrSplit().run()"
 				>
 					{{ $t('input.editor.table.mergeOrSplit') }}
 				</BaseButton>
 				<BaseButton
 					class="editor-toolbar__button"
-					:disabled="!editor.can().fixTables"
+					:disabled="!editor.can().chain().focus().fixTables().run()"
 					@click="editor.chain().focus().fixTables().run()"
 				>
 					{{ $t('input.editor.table.fixTables') }}
