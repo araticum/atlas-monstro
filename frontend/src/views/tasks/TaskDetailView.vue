@@ -326,6 +326,11 @@
 						/>
 					</div>
 
+					<CustomFields
+						:task-id="task.id"
+						:disabled="!canWrite"
+					/>
+
 					<!-- Description -->
 					<div class="details content description">
 						<Description
@@ -643,6 +648,7 @@ import Attachments from '@/components/tasks/partials/Attachments.vue'
 import ChecklistSummary from '@/components/tasks/partials/ChecklistSummary.vue'
 import ColorPicker from '@/components/input/ColorPicker.vue'
 import Comments from '@/components/tasks/partials/Comments.vue'
+import CustomFields from '@/components/tasks/CustomFields.vue'
 import CreatedUpdated from '@/components/tasks/partials/CreatedUpdated.vue'
 import Datepicker from '@/components/input/Datepicker.vue'
 import Description from '@/components/tasks/partials/Description.vue'
