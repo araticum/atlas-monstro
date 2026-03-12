@@ -883,11 +883,21 @@
         "relatedTasks": "Add Relation",
         "moveProject": "Move",
         "duplicate": "Duplicate",
+        "markTemplate": "Mark as Template",
+        "unmarkTemplate": "Remove Template Mark",
         "color": "Set Color",
         "delete": "Delete",
         "favorite": "Add to Favorites",
         "unfavorite": "Remove from Favorites"
       }
+    },
+    "templates": {
+      "title": "Task Templates",
+      "empty": "No templates in this project yet.",
+      "use": "Use as Template",
+      "createdSuccess": "Task created from template successfully.",
+      "markedSuccess": "Task marked as template.",
+      "unmarkedSuccess": "Task unmarked as template."
     },
     "attributes": {
       "assignees": "Assignees",
@@ -1111,6 +1121,14 @@
         "text2": "You will lose access to all projects this team has access to. If you change your mind you'll need a team admin to add you again.",
         "success": "You have successfully left the team."
       }
+    },
+    "templates": {
+      "title": "Task Templates",
+      "empty": "No templates in this project yet.",
+      "use": "Use as Template",
+      "createdSuccess": "Task created from template successfully.",
+      "markedSuccess": "Task marked as template.",
+      "unmarkedSuccess": "Task unmarked as template."
     },
     "attributes": {
       "name": "Team Name",

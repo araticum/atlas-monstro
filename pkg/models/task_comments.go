@@ -99,6 +99,12 @@ func (tc *TaskComment) CreateWithTimestamps(s *xorm.Session, a web.Auth) (err er
 		}
 	}
 
+	if err := RecordTaskActivity(s, tc.TaskID, tc.Author.ID, "commented", map[string]TaskActivityFieldChange{
+		"comment": {Old: nil, New: tc.Comment},
+	}); err != nil {
+		return err
+	}
+
 	events.DispatchOnCommit(s, &TaskCommentCreatedEvent{
 		Task:    &task,
 		Comment: tc,
@@ -139,10 +145,18 @@ func (tc *TaskComment) Delete(s *xorm.Session, a web.Auth) error {
 		return err
 	}
 
-	doer, _ := user.GetFromAuth(a)
+	doer, _ := GetUserOrLinkShareUser(s, a)
 	task, err := GetTaskByIDSimple(s, tc.TaskID)
 	if err != nil {
 		return err
+	}
+
+	if doer != nil {
+		if err := RecordTaskActivity(s, tc.TaskID, doer.ID, "commented", map[string]TaskActivityFieldChange{
+			"comment": {Old: tc.Comment, New: nil},
+		}); err != nil {
+			return err
+		}
 	}
 
 	events.DispatchOnCommit(s, &TaskCommentDeletedEvent{
@@ -167,7 +181,12 @@ func (tc *TaskComment) Delete(s *xorm.Session, a web.Auth) error {
 // @Failure 404 {object} web.HTTPError "The task comment was not found."
 // @Failure 500 {object} models.Message "Internal error"
 // @Router /tasks/{taskID}/comments/{commentID} [post]
-func (tc *TaskComment) Update(s *xorm.Session, _ web.Auth) error {
+func (tc *TaskComment) Update(s *xorm.Session, a web.Auth) error {
+	oldComment := &TaskComment{ID: tc.ID}
+	if err := getTaskCommentSimple(s, oldComment); err != nil {
+		return err
+	}
+
 	updated, err := s.
 		ID(tc.ID).
 		Cols("comment").
@@ -180,6 +199,19 @@ func (tc *TaskComment) Update(s *xorm.Session, _ web.Auth) error {
 		return err
 	}
 
+	doer, _ := GetUserOrLinkShareUser(s, a)
+	actorID := oldComment.AuthorID
+	if doer != nil {
+		actorID = doer.ID
+	}
+	if err := RecordTaskActivity(s, tc.TaskID, actorID, "commented", map[string]TaskActivityFieldChange{
+		"comment": {Old: oldComment.Comment, New: tc.Comment},
+	}); err != nil {
+		return err
+	}
+
+	tc.AuthorID = oldComment.AuthorID
+	tc.Author = doer
 	task, err := GetTaskSimple(s, &Task{ID: tc.TaskID})
 	if err != nil {
 		return err

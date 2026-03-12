@@ -81,6 +81,8 @@ type Task struct {
 	Labels []*Label `xorm:"-" json:"labels"`
 	// The task color in hex
 	HexColor string `xorm:"varchar(6) null" json:"hex_color" valid:"runelength(0|7)" maxLength:"7"`
+	// Whether this task is a reusable template.
+	IsTemplate bool `xorm:"default false" json:"is_template"`
 	// Determines how far a task is left from being done
 	PercentDone float64 `xorm:"DOUBLE null" json:"percent_done"`
 
@@ -961,6 +963,12 @@ func createTask(s *xorm.Session, t *Task, a web.Auth, updateAssignees bool, setB
 		}
 	}
 
+	if err = RecordTaskActivity(s, t.ID, createdBy.ID, "created", map[string]TaskActivityFieldChange{
+		"title": {Old: nil, New: t.Title},
+	}); err != nil {
+		return err
+	}
+
 	events.DispatchOnCommit(s, &TaskCreatedEvent{
 		Task: t,
 		Doer: createdBy,
@@ -1066,6 +1074,7 @@ func (t *Task) updateSingleTask(s *xorm.Session, a web.Auth, fields []string) (e
 	if err != nil {
 		return
 	}
+	originalTask := ot
 
 	if t.ProjectID == 0 {
 		t.ProjectID = ot.ProjectID
@@ -1101,6 +1110,7 @@ func (t *Task) updateSingleTask(s *xorm.Session, a web.Auth, fields []string) (e
 		"bucket_id",
 		"repeat_mode",
 		"cover_image_attachment_id",
+		"is_template",
 	}
 
 	// Validate fields if provided
@@ -1162,6 +1172,9 @@ func (t *Task) updateSingleTask(s *xorm.Session, a web.Auth, fields []string) (e
 		}
 		if !fieldSet["cover_image_attachment_id"] {
 			t.CoverImageAttachmentID = ot.CoverImageAttachmentID
+		}
+		if !fieldSet["is_template"] {
+			t.IsTemplate = ot.IsTemplate
 		}
 	}
 
@@ -1377,7 +1390,20 @@ func (t *Task) updateSingleTask(s *xorm.Session, a web.Auth, fields []string) (e
 	}
 	t.Updated = nt.Updated
 
-	doer, _ := user.GetFromAuth(a)
+	doer, _ := GetUserOrLinkShareUser(s, a)
+	changes := BuildTaskAuditChanges(&originalTask, t)
+	if len(changes) > 0 {
+		action := "updated"
+		if _, hasStatus := changes["status"]; hasStatus && len(changes) == 1 {
+			action = "status_changed"
+		}
+		if doer != nil {
+			if err = RecordTaskActivity(s, t.ID, doer.ID, action, changes); err != nil {
+				return err
+			}
+		}
+	}
+
 	events.DispatchOnCommit(s, &TaskUpdatedEvent{
 		Task: t,
 		Doer: doer,

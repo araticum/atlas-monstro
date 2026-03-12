@@ -432,6 +432,11 @@ func registerAPIRoutes(a *echo.Group) {
 	a.DELETE("/projects/:project", projectHandler.DeleteWeb)
 	a.PUT("/projects", projectHandler.CreateWeb)
 	a.GET("/projects/:project/projectusers", apiv1.ListUsersForProject)
+	a.GET("/projects/:project/field-schemas", apiv1.ListTaskFieldSchemas)
+	a.POST("/projects/:project/field-schemas", apiv1.CreateTaskFieldSchema)
+	a.DELETE("/projects/:project/field-schemas/:schema", apiv1.DeleteTaskFieldSchema)
+	a.GET("/projects/:project/task-templates", apiv1.ListProjectTaskTemplates)
+	a.POST("/projects/:project/task-templates/:template/duplicate", apiv1.DuplicateTaskTemplate)
 
 	if config.ServiceEnableLinkSharing.GetBool() {
 		projectSharingHandler := &handler.WebHandler{
@@ -480,6 +485,7 @@ func registerAPIRoutes(a *echo.Group) {
 	a.GET("/tasks", taskCollectionHandler.ReadAllWeb)
 	a.DELETE("/tasks/:projecttask", taskHandler.DeleteWeb)
 	a.POST("/tasks/:projecttask", taskHandler.UpdateWeb)
+	a.PUT("/tasks/:task/template", apiv1.UpdateTaskTemplate)
 
 	taskDuplicateHandler := &handler.WebHandler{
 		EmptyStruct: func() handler.CObject {
@@ -502,6 +508,10 @@ func registerAPIRoutes(a *echo.Group) {
 		},
 	}
 	a.POST("/tasks/:task/position", taskPositionHandler.UpdateWeb)
+	a.GET("/tasks/:task/custom-fields", apiv1.GetTaskCustomFields)
+	a.GET("/tasks/:task/activities", apiv1.GetTaskActivities)
+	a.PUT("/tasks/:task/custom-fields/:schema", apiv1.PutTaskCustomFieldValue)
+	a.DELETE("/tasks/:task/custom-fields/:schema", apiv1.DeleteTaskCustomFieldValue)
 
 	bulkTaskHandler := &handler.WebHandler{
 		EmptyStruct: func() handler.CObject {
