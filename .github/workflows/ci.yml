@@ -4,6 +4,7 @@ env:
   DO_NOT_TRACK: 1
 
 on:
+  workflow_dispatch:
   pull_request:
   push:
     branches:
@@ -25,7 +26,7 @@ jobs:
 
   release:
     name: Release
-    if: ${{ github.ref_type == 'tag' || github.ref_name == 'main' }}
+    if: ${{ github.ref_type == 'tag' }}
     uses: ./.github/workflows/release.yml
     needs:
       - test
