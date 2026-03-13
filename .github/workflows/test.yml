@@ -7,6 +7,8 @@ jobs:
   mage:
     runs-on: self-hosted
     name: prepare-mage
+    env:
+      GOPATH: /tmp/go-${{ github.run_id }}-${{ github.run_attempt }}-mage
     steps:
       - uses: actions/checkout@v4 # v6
       - name: Set up Go
@@ -35,6 +37,8 @@ jobs:
   api-build:
     runs-on: self-hosted
     needs: mage
+    env:
+      GOPATH: /tmp/go-${{ github.run_id }}-${{ github.run_attempt }}-api-build
     steps:
       - uses: actions/checkout@v4 # v6
         with:
@@ -68,6 +72,8 @@ jobs:
 
   api-lint:
     runs-on: self-hosted
+    env:
+      GOPATH: /tmp/go-${{ github.run_id }}-${{ github.run_attempt }}-api-lint
     steps:
       - uses: actions/checkout@v4 # v6
       - uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5 # v6
@@ -168,6 +174,8 @@ jobs:
 
   test-api:
     runs-on: self-hosted
+    env:
+      GOPATH: /tmp/go-${{ github.run_id }}-${{ github.run_attempt }}-test-api-${{ matrix.db }}-${{ matrix.test }}
     needs:
       - mage
     strategy:
@@ -264,6 +272,8 @@ jobs:
 
   test-s3-integration:
     runs-on: self-hosted
+    env:
+      GOPATH: /tmp/go-${{ github.run_id }}-${{ github.run_attempt }}-test-s3-integration
     needs:
       - mage
     services:
