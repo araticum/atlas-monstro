@@ -17,49 +17,26 @@
 package migration
 
 import (
-	"code.vikunja.io/api/pkg/config"
+	"code.vikunja.io/api/pkg/models"
 	"src.techknowlogick.com/xormigrate"
 	"xorm.io/xorm"
 )
 
 func init() {
 	migrations = append(migrations, &xormigrate.Migration{
-		ID:          "20260312160000",
-		Description: "Add is_template flag to tasks",
+		ID:          "20260313100000",
+		Description: "Add custom field tables",
 		Migrate: func(tx *xorm.Engine) error {
-			switch config.DatabaseType.GetString() {
-			case "postgres":
-				_, err := tx.Exec("ALTER TABLE tasks ADD COLUMN IF NOT EXISTS is_template BOOLEAN DEFAULT FALSE")
-				return err
-			case "mysql", "mariadb":
-				exists, err := columnExists(tx, "tasks", "is_template")
-				if err != nil {
-					return err
-				}
-				if !exists {
-					_, err = tx.Exec("ALTER TABLE tasks ADD COLUMN is_template BOOLEAN DEFAULT FALSE")
-					if err != nil {
-						return err
-					}
-				}
-				return nil
-			case "sqlite":
-				exists, err := columnExists(tx, "tasks", "is_template")
-				if err != nil {
-					return err
-				}
-				if exists {
-					return nil
-				}
-				_, err = tx.Exec("ALTER TABLE tasks ADD COLUMN is_template BOOLEAN DEFAULT FALSE")
-				return err
-			default:
-				_, err := tx.Exec("ALTER TABLE tasks ADD COLUMN is_template BOOLEAN DEFAULT FALSE")
-				return err
-			}
+			return tx.Sync2(
+				new(models.TaskFieldSchema),
+				new(models.TaskCustomFieldValue),
+			)
 		},
 		Rollback: func(tx *xorm.Engine) error {
-			return dropTableColum(tx, "tasks", "is_template")
+			return tx.DropTables(
+				new(models.TaskFieldSchema),
+				new(models.TaskCustomFieldValue),
+			)
 		},
 	})
 }
