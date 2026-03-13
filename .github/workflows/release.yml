@@ -73,7 +73,7 @@ jobs:
           echo "describe=$GIT_DESC" >> $GITHUB_OUTPUT
       - uses: useblacksmith/setup-go@647ac649bd5b480f2a262e3e3e5f4d150ed452ad # v6
         with:
-          go-version: stable
+          go-version-file: go.mod
       - name: Download Mage Binary
         uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
         with:
@@ -328,7 +328,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5 # v6
         with:
-          go-version: stable
+          go-version-file: go.mod
       - name: generate
         run: |
           export PATH=$PATH:$GOPATH/bin
