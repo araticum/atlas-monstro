@@ -3,6 +3,22 @@ name: Test
 on:
   workflow_call:
 
+env:
+  WORKSPACE_CLEAN_CMD: >-
+    docker run --rm
+    -v "${{ github.workspace }}:/work"
+    alpine:3.22
+    sh -lc 'rm -rf
+    /work/frontend/dist
+    /work/frontend/playwright-report
+    /work/frontend/test-results
+    /work/frontend/node_modules
+    /work/.claude
+    /work/.git/index.lock
+    /work/vikunja-unstable-linux-amd64
+    /work/vikunja-latest.zip
+    || true'
+
 jobs:
   mage:
     runs-on: self-hosted
@@ -10,8 +26,8 @@ jobs:
     env:
       GOPATH: /tmp/go-${{ github.run_id }}-${{ github.run_attempt }}-mage
     steps:
-      - name: Fix workspace permissions
-        run: sudo chown -R $(id -u):$(id -g) "${{ github.workspace }}" || true
+      - name: Reset workspace
+        run: ${{ env.WORKSPACE_CLEAN_CMD }}
       - uses: actions/checkout@v4 # v6
       - name: Set up Go
         uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5 # v6
@@ -42,8 +58,8 @@ jobs:
     env:
       GOPATH: /tmp/go-${{ github.run_id }}-${{ github.run_attempt }}-api-build
     steps:
-      - name: Fix workspace permissions
-        run: sudo chown -R $(id -u):$(id -g) "${{ github.workspace }}" || true
+      - name: Reset workspace
+        run: ${{ env.WORKSPACE_CLEAN_CMD }}
       - uses: actions/checkout@v4 # v6
         with:
           fetch-depth: 0
@@ -79,8 +95,8 @@ jobs:
     env:
       GOPATH: /tmp/go-${{ github.run_id }}-${{ github.run_attempt }}-api-lint
     steps:
-      - name: Fix workspace permissions
-        run: sudo chown -R $(id -u):$(id -g) "${{ github.workspace }}" || true
+      - name: Reset workspace
+        run: ${{ env.WORKSPACE_CLEAN_CMD }}
       - uses: actions/checkout@v4 # v6
       - uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5 # v6
         with:
@@ -98,8 +114,8 @@ jobs:
     runs-on: self-hosted
     needs: mage
     steps:
-      - name: Fix workspace permissions
-        run: sudo chown -R $(id -u):$(id -g) "${{ github.workspace }}" || true
+      - name: Reset workspace
+        run: ${{ env.WORKSPACE_CLEAN_CMD }}
       - uses: actions/checkout@v4 # v6
       - name: Download Mage Binary
         uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
@@ -123,24 +139,27 @@ jobs:
           - mysql
     services:
       migration-smoke-db-mysql:
-        image: ${{ matrix.db == 'mysql' && 'mariadb:12@sha256:f54db0cb3ccfe9431aba6d08c65a1763c499789b116b4cb651dd7fcf325965b3' || '' }}
+        image: mariadb:12@sha256:f54db0cb3ccfe9431aba6d08c65a1763c499789b116b4cb651dd7fcf325965b3
         env:
           MYSQL_ROOT_PASSWORD: vikunjatest
           MYSQL_DATABASE: vikunjatest
+        ports:
+          - "3306:3306"
       migration-smoke-db-postgres:
-        image: ${{ matrix.db == 'postgres' && 'postgres:18@sha256:5773fe724c49c42a7a9ca70202e11e1dff21fb7235b335a73f39297d200b73a2' || '' }}
+        image: postgres:18@sha256:5773fe724c49c42a7a9ca70202e11e1dff21fb7235b335a73f39297d200b73a2
         env:
           POSTGRES_PASSWORD: vikunjatest
           POSTGRES_DB: vikunjatest
         ports:
           - "5432:5432"
     steps:
-      - name: Fix workspace permissions
-        run: sudo chown -R $(id -u):$(id -g) "${{ github.workspace }}" || true
+      - name: Reset workspace
+        run: ${{ env.WORKSPACE_CLEAN_CMD }}
       - name: Download Unstable
         run: |
+          rm -f vikunja-unstable-linux-amd64 vikunja-latest.zip
           wget https://dl.vikunja.io/vikunja/unstable/vikunja-unstable-linux-amd64-full.zip -q -O vikunja-latest.zip
-          unzip vikunja-latest.zip vikunja-unstable-linux-amd64
+          unzip -o vikunja-latest.zip vikunja-unstable-linux-amd64
       - name: Download Vikunja Binary
         uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
         with:
@@ -153,6 +172,7 @@ jobs:
           VIKUNJA_DATABASE_PASSWORD: vikunjatest
           VIKUNJA_DATABASE_DATABASE: vikunjatest
           VIKUNJA_DATABASE_SSLMODE: disable
+          VIKUNJA_DATABASE_HOST: 127.0.0.1
           VIKUNJA_LOG_DATABASE: stdout
           VIKUNJA_LOG_DATABASELEVEL: debug
           VIKUNJA_SERVICE_PUBLICURL: http://127.0.0.1:3456
@@ -212,19 +232,21 @@ jobs:
             test: e2e-api
     services:
       db-mysql:
-        image: ${{ matrix.db == 'mysql' && 'mariadb:12@sha256:5b6a1eac15b85b981a61afb89aea2a22bf76b5f58809d05f0bcc13ab6ec44cb8' || '' }}
+        image: mariadb:12@sha256:5b6a1eac15b85b981a61afb89aea2a22bf76b5f58809d05f0bcc13ab6ec44cb8
         env:
           MYSQL_ROOT_PASSWORD: vikunjatest
           MYSQL_DATABASE: vikunjatest
+        ports:
+          - "3306:3306"
       db-postgres:
-        image: ${{ matrix.db == 'postgres' && 'postgres:18@sha256:073e7c8b84e2197f94c8083634640ab37105effe1bc853ca4d5fbece3219b0e8' || '' }}
+        image: postgres:18@sha256:073e7c8b84e2197f94c8083634640ab37105effe1bc853ca4d5fbece3219b0e8
         env:
           POSTGRES_PASSWORD: vikunjatest
           POSTGRES_DB: vikunjatest
         ports:
           - "5432:5432"
       db-paradedb:
-        image: ${{ matrix.db == 'paradedb' && 'paradedb/paradedb:latest-pg17@sha256:5a60852994cb0663ed9cdb04796a487605f8b99266e3ad5057f10e09e1aa019d' || '' }}
+        image: paradedb/paradedb:latest-pg17@sha256:5a60852994cb0663ed9cdb04796a487605f8b99266e3ad5057f10e09e1aa019d
         env:
           POSTGRES_PASSWORD: vikunjatest
           POSTGRES_DB: vikunjatest
@@ -235,8 +257,8 @@ jobs:
         ports:
           - "8389:389"
     steps:
-      - name: Fix workspace permissions
-        run: sudo chown -R $(id -u):$(id -g) "${{ github.workspace }}" || true
+      - name: Reset workspace
+        run: ${{ env.WORKSPACE_CLEAN_CMD }}
       - uses: actions/checkout@v4 # v6
       - name: Download Mage Binary
         uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
@@ -246,6 +268,26 @@ jobs:
         uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5 # v6
         with:
           go-version-file: go.mod
+      - name: Wait for database
+        if: matrix.db == 'mysql' || matrix.db == 'postgres' || matrix.db == 'paradedb'
+        run: |
+          if [ "${{ matrix.db }}" = "mysql" ]; then
+            until mysqladmin ping -h 127.0.0.1 -P 3306 -uroot -pvikunjatest --silent; do
+              echo "Waiting for MySQL..."
+              sleep 2
+            done
+          fi
+
+          if [ "${{ matrix.db }}" = "postgres" ] || [ "${{ matrix.db }}" = "paradedb" ]; then
+            DB_PORT="5432"
+            if [ "${{ matrix.db }}" = "paradedb" ]; then
+              DB_PORT="5433"
+            fi
+            until PGPASSWORD=vikunjatest psql -h 127.0.0.1 -p "$DB_PORT" -U postgres -d vikunjatest -c "SELECT 1" >/dev/null 2>&1; do
+              echo "Waiting for PostgreSQL on $DB_PORT..."
+              sleep 2
+            done
+          fi
       - name: Configure Postgres for faster tests
         if: matrix.db == 'postgres' || matrix.db == 'paradedb'
         run: |
@@ -255,11 +297,11 @@ jobs:
           fi
 
           # Connect to Postgres and disable fsync, full_page_writes, and synchronous_commit for faster tests
-          PGPASSWORD=vikunjatest psql -h localhost -p "$DB_PORT" -U postgres -d vikunjatest -c "ALTER SYSTEM SET fsync = off;"
-          PGPASSWORD=vikunjatest psql -h localhost -p "$DB_PORT" -U postgres -d vikunjatest -c "ALTER SYSTEM SET full_page_writes = off;"
-          PGPASSWORD=vikunjatest psql -h localhost -p "$DB_PORT" -U postgres -d vikunjatest -c "ALTER SYSTEM SET synchronous_commit = off;"
+          PGPASSWORD=vikunjatest psql -h 127.0.0.1 -p "$DB_PORT" -U postgres -d vikunjatest -c "ALTER SYSTEM SET fsync = off;"
+          PGPASSWORD=vikunjatest psql -h 127.0.0.1 -p "$DB_PORT" -U postgres -d vikunjatest -c "ALTER SYSTEM SET full_page_writes = off;"
+          PGPASSWORD=vikunjatest psql -h 127.0.0.1 -p "$DB_PORT" -U postgres -d vikunjatest -c "ALTER SYSTEM SET synchronous_commit = off;"
           # Reload the configuration
-          PGPASSWORD=vikunjatest psql -h localhost -p "$DB_PORT" -U postgres -d vikunjatest -c "SELECT pg_reload_conf();"
+          PGPASSWORD=vikunjatest psql -h 127.0.0.1 -p "$DB_PORT" -U postgres -d vikunjatest -c "SELECT pg_reload_conf();"
       - name: test
         env:
           VIKUNJA_TESTS_USE_CONFIG: ${{ matrix.db != 'sqlite-in-memory' && 1 || 0 }}
@@ -300,8 +342,8 @@ jobs:
         ports:
           - 9000:9000
     steps:
-      - name: Fix workspace permissions
-        run: sudo chown -R $(id -u):$(id -g) "${{ github.workspace }}" || true
+      - name: Reset workspace
+        run: ${{ env.WORKSPACE_CLEAN_CMD }}
       - uses: actions/checkout@v4 # v6
       - name: Download Mage Binary
         uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
@@ -333,8 +375,8 @@ jobs:
   frontend-lint:
     runs-on: self-hosted
     steps:
-      - name: Fix workspace permissions
-        run: sudo chown -R $(id -u):$(id -g) "${{ github.workspace }}" || true
+      - name: Reset workspace
+        run: ${{ env.WORKSPACE_CLEAN_CMD }}
       - uses: actions/checkout@v4 # v6
       - uses: ./.github/actions/setup-frontend
       - name: Lint
@@ -344,8 +386,8 @@ jobs:
   frontend-stylelint:
     runs-on: self-hosted
     steps:
-      - name: Fix workspace permissions
-        run: sudo chown -R $(id -u):$(id -g) "${{ github.workspace }}" || true
+      - name: Reset workspace
+        run: ${{ env.WORKSPACE_CLEAN_CMD }}
       - uses: actions/checkout@v4 # v6
       - uses: ./.github/actions/setup-frontend
       - name: Lint styles
@@ -355,8 +397,8 @@ jobs:
   frontend-typecheck:
     runs-on: self-hosted
     steps:
-      - name: Fix workspace permissions
-        run: sudo chown -R $(id -u):$(id -g) "${{ github.workspace }}" || true
+      - name: Reset workspace
+        run: ${{ env.WORKSPACE_CLEAN_CMD }}
       - uses: actions/checkout@v4 # v6
       - uses: ./.github/actions/setup-frontend
       - name: Typecheck
@@ -367,8 +409,8 @@ jobs:
   test-frontend-unit:
     runs-on: self-hosted
     steps:
-      - name: Fix workspace permissions
-        run: sudo chown -R $(id -u):$(id -g) "${{ github.workspace }}" || true
+      - name: Reset workspace
+        run: ${{ env.WORKSPACE_CLEAN_CMD }}
       - uses: actions/checkout@v4 # v6
       - uses: ./.github/actions/setup-frontend
       - name: Run unit tests
@@ -378,8 +420,8 @@ jobs:
   frontend-build:
     runs-on: self-hosted
     steps:
-      - name: Fix workspace permissions
-        run: sudo chown -R $(id -u):$(id -g) "${{ github.workspace }}" || true
+      - name: Reset workspace
+        run: ${{ env.WORKSPACE_CLEAN_CMD }}
       - uses: actions/checkout@v4 # v6
         with:
           fetch-depth: 0
@@ -422,6 +464,8 @@ jobs:
       image: mcr.microsoft.com/playwright:v1.58.2-jammy@sha256:4698a73749c5848d3f5fcd42a2174d172fcad2b2283e087843b115424303a565
       options: --user root
     steps:
+      - name: Reset workspace
+        run: ${{ env.WORKSPACE_CLEAN_CMD }}
       - uses: actions/checkout@v4 # v6
       - name: Fix runner temp permissions
         run: |
