@@ -353,7 +353,6 @@ jobs:
       - binaries
       - os-package
       - desktop
-    if: ${{ github.ref_type == 'tag' }}
     permissions:
       contents: write
     steps:
