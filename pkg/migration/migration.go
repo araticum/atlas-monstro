@@ -126,7 +126,7 @@ func dropTableColum(x *xorm.Engine, tableName, col string) error {
 	switch config.DatabaseType.GetString() {
 	case "sqlite":
 		log.Warning("Unable to drop columns in SQLite")
-	case "mysql":
+	case "mysql", "mariadb":
 		_, err := x.Exec("ALTER TABLE " + tableName + " DROP COLUMN " + col)
 		if err != nil {
 			return err
@@ -147,7 +147,7 @@ func modifyColumn(x *xorm.Engine, tableName, col, newDefinition string) error {
 	switch config.DatabaseType.GetString() {
 	case "sqlite":
 		log.Warning("Unable to modify columns in SQLite")
-	case "mysql":
+	case "mysql", "mariadb":
 		_, err := x.Exec("ALTER TABLE " + tableName + " MODIFY COLUMN " + col + " " + newDefinition)
 		if err != nil {
 			return err
@@ -170,7 +170,7 @@ func renameTable(x *xorm.Engine, oldName, newName string) error {
 		if err != nil {
 			return err
 		}
-	case "mysql":
+	case "mysql", "mariadb":
 		_, err := x.Exec("RENAME TABLE `" + oldName + "` TO `" + newName + "`")
 		if err != nil {
 			return err
@@ -201,7 +201,7 @@ func columnExists(x *xorm.Engine, tableName, columnName string) (bool, error) {
 			}
 		}
 		return false, nil
-	case "mysql":
+	case "mysql", "mariadb":
 		results, err := x.Query("SHOW COLUMNS FROM `" + tableName + "` LIKE '" + columnName + "'")
 		if err != nil {
 			return false, err
