@@ -12,7 +12,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5 # v6
         with:
-          go-version: stable
+          go-version-file: go.mod
       - name: Cache Mage
         id: cache-mage
         uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5
@@ -51,7 +51,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5 # v6
         with:
-          go-version: stable
+          go-version-file: go.mod
       - name: Build
         env:
           RELEASE_VERSION: ${{ steps.ghd.outputs.describe }}
@@ -72,7 +72,7 @@ jobs:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
       - uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5 # v6
         with:
-          go-version: stable
+          go-version-file: go.mod
       - name: prepare frontend files
         run: |
           mkdir -p frontend/dist
@@ -229,7 +229,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5 # v6
         with:
-          go-version: stable
+          go-version-file: go.mod
       - name: Configure Postgres for faster tests
         if: matrix.db == 'postgres' || matrix.db == 'paradedb'
         run: |
@@ -284,7 +284,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5 # v6
         with:
-          go-version: stable
+          go-version-file: go.mod
       - name: test S3 file storage integration
         env:
           VIKUNJA_TESTS_USE_CONFIG: 1
