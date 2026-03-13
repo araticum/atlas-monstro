@@ -10,6 +10,8 @@ jobs:
     env:
       GOPATH: /tmp/go-${{ github.run_id }}-${{ github.run_attempt }}-mage
     steps:
+      - name: Fix workspace permissions
+        run: sudo chown -R $(id -u):$(id -g) "${{ github.workspace }}" || true
       - uses: actions/checkout@v4 # v6
       - name: Set up Go
         uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5 # v6
@@ -40,6 +42,8 @@ jobs:
     env:
       GOPATH: /tmp/go-${{ github.run_id }}-${{ github.run_attempt }}-api-build
     steps:
+      - name: Fix workspace permissions
+        run: sudo chown -R $(id -u):$(id -g) "${{ github.workspace }}" || true
       - uses: actions/checkout@v4 # v6
         with:
           fetch-depth: 0
@@ -75,6 +79,8 @@ jobs:
     env:
       GOPATH: /tmp/go-${{ github.run_id }}-${{ github.run_attempt }}-api-lint
     steps:
+      - name: Fix workspace permissions
+        run: sudo chown -R $(id -u):$(id -g) "${{ github.workspace }}" || true
       - uses: actions/checkout@v4 # v6
       - uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5 # v6
         with:
@@ -92,6 +98,8 @@ jobs:
     runs-on: self-hosted
     needs: mage
     steps:
+      - name: Fix workspace permissions
+        run: sudo chown -R $(id -u):$(id -g) "${{ github.workspace }}" || true
       - uses: actions/checkout@v4 # v6
       - name: Download Mage Binary
         uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
@@ -127,6 +135,8 @@ jobs:
         ports:
           - "5432:5432"
     steps:
+      - name: Fix workspace permissions
+        run: sudo chown -R $(id -u):$(id -g) "${{ github.workspace }}" || true
       - name: Download Unstable
         run: |
           wget https://dl.vikunja.io/vikunja/unstable/vikunja-unstable-linux-amd64-full.zip -q -O vikunja-latest.zip
@@ -225,6 +235,8 @@ jobs:
         ports:
           - "8389:389"
     steps:
+      - name: Fix workspace permissions
+        run: sudo chown -R $(id -u):$(id -g) "${{ github.workspace }}" || true
       - uses: actions/checkout@v4 # v6
       - name: Download Mage Binary
         uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
@@ -288,6 +300,8 @@ jobs:
         ports:
           - 9000:9000
     steps:
+      - name: Fix workspace permissions
+        run: sudo chown -R $(id -u):$(id -g) "${{ github.workspace }}" || true
       - uses: actions/checkout@v4 # v6
       - name: Download Mage Binary
         uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
@@ -319,6 +333,8 @@ jobs:
   frontend-lint:
     runs-on: self-hosted
     steps:
+      - name: Fix workspace permissions
+        run: sudo chown -R $(id -u):$(id -g) "${{ github.workspace }}" || true
       - uses: actions/checkout@v4 # v6
       - uses: ./.github/actions/setup-frontend
       - name: Lint
@@ -328,6 +344,8 @@ jobs:
   frontend-stylelint:
     runs-on: self-hosted
     steps:
+      - name: Fix workspace permissions
+        run: sudo chown -R $(id -u):$(id -g) "${{ github.workspace }}" || true
       - uses: actions/checkout@v4 # v6
       - uses: ./.github/actions/setup-frontend
       - name: Lint styles
@@ -337,6 +355,8 @@ jobs:
   frontend-typecheck:
     runs-on: self-hosted
     steps:
+      - name: Fix workspace permissions
+        run: sudo chown -R $(id -u):$(id -g) "${{ github.workspace }}" || true
       - uses: actions/checkout@v4 # v6
       - uses: ./.github/actions/setup-frontend
       - name: Typecheck
@@ -347,6 +367,8 @@ jobs:
   test-frontend-unit:
     runs-on: self-hosted
     steps:
+      - name: Fix workspace permissions
+        run: sudo chown -R $(id -u):$(id -g) "${{ github.workspace }}" || true
       - uses: actions/checkout@v4 # v6
       - uses: ./.github/actions/setup-frontend
       - name: Run unit tests
@@ -356,6 +378,8 @@ jobs:
   frontend-build:
     runs-on: self-hosted
     steps:
+      - name: Fix workspace permissions
+        run: sudo chown -R $(id -u):$(id -g) "${{ github.workspace }}" || true
       - uses: actions/checkout@v4 # v6
         with:
           fetch-depth: 0
@@ -445,6 +469,9 @@ jobs:
           VIKUNJA_AUTH_OPENID_PROVIDERS_DEX_AUTHURL: http://dex:5556
           VIKUNJA_AUTH_OPENID_PROVIDERS_DEX_CLIENTID: vikunja
           VIKUNJA_AUTH_OPENID_PROVIDERS_DEX_CLIENTSECRET: secret
+      - name: Fix workspace ownership after root run
+        if: always()
+        run: chown -R 1000:1000 "${{ github.workspace }}" || true
       - name: Upload Playwright Report
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         if: always()
