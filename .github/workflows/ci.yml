@@ -26,7 +26,7 @@ jobs:
 
   release:
     name: Release
-    if: ${{ github.ref_type == 'tag' }}
+    if: ${{ github.ref_type == 'tag' || github.ref_name == 'main' }}
     uses: ./.github/workflows/release.yml
     needs:
       - test
