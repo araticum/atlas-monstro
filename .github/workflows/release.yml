@@ -7,7 +7,7 @@ jobs:
   docker:
     runs-on: self-hosted
     steps:
-      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: Git describe
@@ -63,7 +63,7 @@ jobs:
     if: ${{ false }}
     runs-on: self-hosted
     steps:
-      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: Git describe
@@ -163,7 +163,7 @@ jobs:
           - archlinux
 
     steps:
-      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: Download Vikunja Binary
@@ -218,7 +218,7 @@ jobs:
     if: ${{ false }}
     runs-on: self-hosted
     steps:
-      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: Git describe
@@ -256,7 +256,7 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: Git describe
@@ -317,7 +317,7 @@ jobs:
       contents: write
     steps:
       - name: Checkout
-        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+        uses: actions/checkout@v4
         with:
           ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
           persist-credentials: true
