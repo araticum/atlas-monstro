@@ -5,7 +5,7 @@ on:
 
 jobs:
   docker:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
         with:
@@ -59,7 +59,7 @@ jobs:
 
   binaries:
     if: ${{ false }}
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
         with:
@@ -147,7 +147,7 @@ jobs:
 
   os-package:
     if: ${{ false }}
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs:
       - binaries
     strategy:
@@ -210,7 +210,7 @@ jobs:
 
   config-yaml:
     if: ${{ false }}
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
         with:
@@ -302,7 +302,7 @@ jobs:
 
   generate-swagger-docs:
     if: ${{ false }}
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     permissions:
       contents: write
     steps:
@@ -348,7 +348,7 @@ jobs:
 
   create-release:
     if: ${{ false }}
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs:
       - binaries
       - os-package
