@@ -5,7 +5,7 @@ on:
 
 jobs:
   mage:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     name: prepare-mage
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
@@ -33,7 +33,7 @@ jobs:
           path: ./mage-static
 
   api-build:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: mage
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
@@ -65,7 +65,7 @@ jobs:
           path: ./vikunja
 
   api-lint:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
       - uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5 # v6
@@ -81,7 +81,7 @@ jobs:
           version: v2.9.0
 
   api-check-translations:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: mage
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
@@ -95,7 +95,7 @@ jobs:
           ./mage-static check:translations
 
   test-migration-smoke:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs:
       - api-build
     strategy:
@@ -167,7 +167,7 @@ jobs:
           ./vikunja migrate
 
   test-api:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs:
       - mage
     strategy:
@@ -261,7 +261,7 @@ jobs:
           ./mage-static test:${{ matrix.test }}
 
   test-s3-integration:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs:
       - mage
     services:
@@ -303,7 +303,7 @@ jobs:
           ./mage-static test:filter "TestFileStorageIntegration"
 
   frontend-lint:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
       - uses: ./.github/actions/setup-frontend
@@ -312,7 +312,7 @@ jobs:
         run: pnpm lint
 
   frontend-stylelint:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
       - uses: ./.github/actions/setup-frontend
@@ -321,7 +321,7 @@ jobs:
         run: pnpm lint:styles
 
   frontend-typecheck:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
       - uses: ./.github/actions/setup-frontend
@@ -331,7 +331,7 @@ jobs:
         run: pnpm typecheck
 
   test-frontend-unit:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
       - uses: ./.github/actions/setup-frontend
@@ -340,7 +340,7 @@ jobs:
         run: pnpm test:unit
 
   frontend-build:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
         with:
@@ -363,7 +363,7 @@ jobs:
           path: ./frontend/dist
 
   test-frontend-e2e-playwright:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs:
       - api-build
       - frontend-build
