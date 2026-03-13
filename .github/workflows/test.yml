@@ -115,12 +115,12 @@ jobs:
           - mysql
     services:
       migration-smoke-db-mysql:
-        image: mariadb:12@sha256:f54db0cb3ccfe9431aba6d08c65a1763c499789b116b4cb651dd7fcf325965b3
+        image: ${{ matrix.db == 'mysql' && 'mariadb:12@sha256:f54db0cb3ccfe9431aba6d08c65a1763c499789b116b4cb651dd7fcf325965b3' || '' }}
         env:
           MYSQL_ROOT_PASSWORD: vikunjatest
           MYSQL_DATABASE: vikunjatest
       migration-smoke-db-postgres:
-        image: postgres:18@sha256:5773fe724c49c42a7a9ca70202e11e1dff21fb7235b335a73f39297d200b73a2
+        image: ${{ matrix.db == 'postgres' && 'postgres:18@sha256:5773fe724c49c42a7a9ca70202e11e1dff21fb7235b335a73f39297d200b73a2' || '' }}
         env:
           POSTGRES_PASSWORD: vikunjatest
           POSTGRES_DB: vikunjatest
@@ -222,6 +222,8 @@ jobs:
           - "5433:5432"
       test-ldap:
         image: gitea/test-openldap@sha256:b66527e298d6062d5289dc411d1b8da1c593f8140a3d1f863e8d9d021234122f
+        ports:
+          - "8389:389"
     steps:
       - uses: actions/checkout@v4 # v6
       - name: Download Mage Binary
@@ -256,8 +258,8 @@ jobs:
           VIKUNJA_DATABASE_SSLMODE: disable
           VIKUNJA_DATABASE_HOST: localhost${{ matrix.db == 'paradedb' && ':5433' || '' }}
           VIKUNJA_AUTH_LDAP_ENABLED: 1
-          VIKUNJA_AUTH_LDAP_HOST: test-ldap
-          VIKUNJA_AUTH_LDAP_PORT: 389
+          VIKUNJA_AUTH_LDAP_HOST: localhost
+          VIKUNJA_AUTH_LDAP_PORT: 8389
           VIKUNJA_AUTH_LDAP_USETLS: 0
           VIKUNJA_AUTH_LDAP_BASEDN: dc=planetexpress,dc=com
           VIKUNJA_AUTH_LDAP_BINDDN: uid=gitea,ou=service,dc=planetexpress,dc=com
@@ -383,7 +385,7 @@ jobs:
       - frontend-build
     strategy:
       fail-fast: false
-      max-parallel: 2
+      max-parallel: 1
       matrix:
         shard: [1, 2, 3, 4, 5, 6]
         total-shards: [6]
