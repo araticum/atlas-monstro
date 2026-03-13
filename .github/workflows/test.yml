@@ -13,8 +13,10 @@ env:
     /work/frontend/playwright-report
     /work/frontend/test-results
     /work/frontend/node_modules
+    /work/frontend/files
     /work/.claude
     /work/.git/index.lock
+    /work/.git/index
     /work/vikunja-unstable-linux-amd64
     /work/vikunja-latest.zip
     || true'

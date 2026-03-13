@@ -16,12 +16,17 @@ runs:
         echo "CYPRESS_INSTALL_BINARY=0"             >> $GITHUB_ENV
         echo "PUPPETEER_SKIP_DOWNLOAD=true"         >> $GITHUB_ENV
         echo "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1"   >> $GITHUB_ENV
-    - name: Set PNPM_HOME to runner temp
+    - name: Set isolated frontend tool/cache dirs
       shell: bash
       run: |
-        PNPM_DIR="${RUNNER_TEMP}/pnpm-$$"
-        mkdir -p "$PNPM_DIR"
+        KEY="${GITHUB_RUN_ID:-local}-${GITHUB_RUN_ATTEMPT:-0}-${GITHUB_JOB:-job}-$$"
+        PNPM_DIR="${RUNNER_TEMP}/pnpm-${KEY}"
+        NPM_CACHE_DIR="${RUNNER_TEMP}/npm-cache-${KEY}"
+        XDG_CACHE_DIR="${RUNNER_TEMP}/xdg-cache-${KEY}"
+        mkdir -p "$PNPM_DIR" "$NPM_CACHE_DIR" "$XDG_CACHE_DIR"
         echo "PNPM_HOME=${PNPM_DIR}" >> $GITHUB_ENV
+        echo "npm_config_cache=${NPM_CACHE_DIR}" >> $GITHUB_ENV
+        echo "XDG_CACHE_HOME=${XDG_CACHE_DIR}" >> $GITHUB_ENV
     - uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061
       with:
         run_install: false
