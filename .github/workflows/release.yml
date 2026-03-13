@@ -12,7 +12,9 @@ jobs:
           fetch-depth: 0
       - name: Git describe
         id: ghd
-        uses: proudust/gh-describe@v2
+        run: |
+          GIT_DESC=$(git describe --tags --always --dirty 2>/dev/null || echo "unstable")
+          echo "describe=$GIT_DESC" >> $GITHUB_OUTPUT
       - name: Login to Docker Hub
         uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef # v3
         with:
@@ -66,7 +68,9 @@ jobs:
           fetch-depth: 0
       - name: Git describe
         id: ghd
-        uses: proudust/gh-describe@v2
+        run: |
+          GIT_DESC=$(git describe --tags --always --dirty 2>/dev/null || echo "unstable")
+          echo "describe=$GIT_DESC" >> $GITHUB_OUTPUT
       - uses: useblacksmith/setup-go@647ac649bd5b480f2a262e3e3e5f4d150ed452ad # v6
         with:
           go-version: stable
@@ -169,7 +173,9 @@ jobs:
           pattern: vikunja-*-linux-amd64
       - name: Git describe
         id: ghd
-        uses: proudust/gh-describe@v2
+        run: |
+          GIT_DESC=$(git describe --tags --always --dirty 2>/dev/null || echo "unstable")
+          echo "describe=$GIT_DESC" >> $GITHUB_OUTPUT
       - name: Download Mage Binary
         uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
         with:
@@ -217,7 +223,9 @@ jobs:
           fetch-depth: 0
       - name: Git describe
         id: ghd
-        uses: proudust/gh-describe@v2
+        run: |
+          GIT_DESC=$(git describe --tags --always --dirty 2>/dev/null || echo "unstable")
+          echo "describe=$GIT_DESC" >> $GITHUB_OUTPUT
       - name: Download Mage Binary
         uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
         with:
@@ -253,7 +261,9 @@ jobs:
           fetch-depth: 0
       - name: Git describe
         id: ghd
-        uses: proudust/gh-describe@v2
+        run: |
+          GIT_DESC=$(git describe --tags --always --dirty 2>/dev/null || echo "unstable")
+          echo "describe=$GIT_DESC" >> $GITHUB_OUTPUT
       - name: Install pnpm
         uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # v4
         with:
