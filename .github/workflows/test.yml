@@ -139,8 +139,10 @@ jobs:
         run: sudo chown -R $(id -u):$(id -g) "${{ github.workspace }}" || true
       - name: Download Unstable
         run: |
+          rm -f vikunja-latest.zip vikunja-unstable-linux-amd64
           wget https://dl.vikunja.io/vikunja/unstable/vikunja-unstable-linux-amd64-full.zip -q -O vikunja-latest.zip
-          unzip vikunja-latest.zip vikunja-unstable-linux-amd64
+          unzip -o -q vikunja-latest.zip vikunja-unstable-linux-amd64
+          chmod +x vikunja-unstable-linux-amd64
       - name: Download Vikunja Binary
         uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
         with:
@@ -336,6 +338,8 @@ jobs:
       - name: Fix workspace permissions
         run: sudo chown -R $(id -u):$(id -g) "${{ github.workspace }}" || true
       - uses: actions/checkout@v4 # v6
+      - name: Clean frontend workspace
+        run: rm -rf frontend/node_modules
       - uses: ./.github/actions/setup-frontend
       - name: Lint
         working-directory: frontend
@@ -347,6 +351,8 @@ jobs:
       - name: Fix workspace permissions
         run: sudo chown -R $(id -u):$(id -g) "${{ github.workspace }}" || true
       - uses: actions/checkout@v4 # v6
+      - name: Clean frontend workspace
+        run: rm -rf frontend/node_modules
       - uses: ./.github/actions/setup-frontend
       - name: Lint styles
         working-directory: frontend
@@ -358,6 +364,8 @@ jobs:
       - name: Fix workspace permissions
         run: sudo chown -R $(id -u):$(id -g) "${{ github.workspace }}" || true
       - uses: actions/checkout@v4 # v6
+      - name: Clean frontend workspace
+        run: rm -rf frontend/node_modules
       - uses: ./.github/actions/setup-frontend
       - name: Typecheck
         continue-on-error: true
@@ -370,6 +378,8 @@ jobs:
       - name: Fix workspace permissions
         run: sudo chown -R $(id -u):$(id -g) "${{ github.workspace }}" || true
       - uses: actions/checkout@v4 # v6
+      - name: Clean frontend workspace
+        run: rm -rf frontend/node_modules
       - uses: ./.github/actions/setup-frontend
       - name: Run unit tests
         working-directory: frontend
@@ -383,6 +393,8 @@ jobs:
       - uses: actions/checkout@v4 # v6
         with:
           fetch-depth: 0
+      - name: Clean frontend workspace
+        run: rm -rf frontend/node_modules frontend/dist
       - uses: ./.github/actions/setup-frontend
       - name: Git describe
         id: ghd
@@ -427,6 +439,8 @@ jobs:
         run: |
           mkdir -p "$RUNNER_TEMP/_runner_file_commands"
           chmod -R 777 "$RUNNER_TEMP" || true
+      - name: Clean frontend workspace
+        run: rm -rf frontend/node_modules
       - name: Download Vikunja Binary
         uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
         with:

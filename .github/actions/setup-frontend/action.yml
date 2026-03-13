@@ -31,7 +31,13 @@ runs:
         node-version-file: frontend/.nvmrc
         cache: 'pnpm'
         cache-dependency-path: frontend/pnpm-lock.yaml
+    - name: Reset frontend dependencies
+      working-directory: frontend
+      run: |
+        rm -rf node_modules
+      shell: bash
     - name: Install dependencies
       working-directory: frontend
-      run: pnpm install --frozen-lockfile --prefer-offline
+      run: |
+        pnpm install --frozen-lockfile --prefer-offline
       shell: bash
