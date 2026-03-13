@@ -45,7 +45,9 @@ jobs:
           name: mage_bin
       - name: Git describe
         id: ghd
-        uses: proudust/gh-describe@v2
+        run: |
+          GIT_DESC=$(git describe --tags --always --dirty 2>/dev/null || echo "unstable")
+          echo "describe=$GIT_DESC" >> $GITHUB_OUTPUT
       - name: Set up Go
         uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5 # v6
         with:
@@ -348,7 +350,9 @@ jobs:
       - uses: ./.github/actions/setup-frontend
       - name: Git describe
         id: ghd
-        uses: proudust/gh-describe@v2
+        run: |
+          GIT_DESC=$(git describe --tags --always --dirty 2>/dev/null || echo "unstable")
+          echo "describe=$GIT_DESC" >> $GITHUB_OUTPUT
       - name: Inject frontend version
         working-directory: frontend
         run: |
