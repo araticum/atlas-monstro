@@ -16,6 +16,12 @@ runs:
         echo "CYPRESS_INSTALL_BINARY=0"             >> $GITHUB_ENV
         echo "PUPPETEER_SKIP_DOWNLOAD=true"         >> $GITHUB_ENV
         echo "PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1"   >> $GITHUB_ENV
+    - name: Set PNPM_HOME to runner temp
+      shell: bash
+      run: |
+        PNPM_DIR="${RUNNER_TEMP}/pnpm-$$"
+        mkdir -p "$PNPM_DIR"
+        echo "PNPM_HOME=${PNPM_DIR}" >> $GITHUB_ENV
     - uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # v4
       with:
         run_install: false
