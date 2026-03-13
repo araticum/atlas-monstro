@@ -158,9 +158,12 @@ jobs:
         run: ${{ env.WORKSPACE_CLEAN_CMD }}
       - name: Download Unstable
         run: |
-          rm -f vikunja-unstable-linux-amd64 vikunja-latest.zip
-          wget https://dl.vikunja.io/vikunja/unstable/vikunja-unstable-linux-amd64-full.zip -q -O vikunja-latest.zip
-          unzip -o vikunja-latest.zip vikunja-unstable-linux-amd64
+          rm -f /tmp/vikunja-unstable-linux-amd64 /tmp/vikunja-latest.zip
+          wget https://dl.vikunja.io/vikunja/unstable/vikunja-unstable-linux-amd64-full.zip -q -O /tmp/vikunja-latest.zip
+          unzip -o /tmp/vikunja-latest.zip vikunja-unstable-linux-amd64
+          mv -f vikunja-unstable-linux-amd64 /tmp/vikunja-unstable-linux-amd64
+          test -f /tmp/vikunja-unstable-linux-amd64
+          chmod +x /tmp/vikunja-unstable-linux-amd64
       - name: Remove unused mysql service container in non-mysql matrix rows
         if: matrix.db == 'postgres' || matrix.db == 'sqlite'
         run: |
@@ -224,7 +227,8 @@ jobs:
             echo "PostgreSQL is ready!"
           fi
 
-          ./vikunja-unstable-linux-amd64 migrate
+          ls -l /tmp/vikunja-unstable-linux-amd64 vikunja || true
+          /tmp/vikunja-unstable-linux-amd64 migrate
           # Run the migrations from the binary built in the step before
           chmod +x vikunja
           ./vikunja migrate
@@ -299,6 +303,7 @@ jobs:
         uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5 # v6
         with:
           go-version-file: go.mod
+          cache: false
       - name: Wait for database
         if: matrix.db == 'mysql' || matrix.db == 'postgres' || matrix.db == 'paradedb'
         run: |
