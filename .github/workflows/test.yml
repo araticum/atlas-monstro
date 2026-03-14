@@ -3,24 +3,6 @@ name: Test
 on:
   workflow_call:
 
-env:
-  WORKSPACE_CLEAN_CMD: >-
-    docker run --rm
-    -v "${{ github.workspace }}:/work"
-    alpine:3.22
-    sh -lc 'rm -rf
-    /work/frontend/dist
-    /work/frontend/playwright-report
-    /work/frontend/test-results
-    /work/frontend/node_modules
-    /work/frontend/files
-    /work/.claude
-    /work/.git/index.lock
-    /work/.git/index
-    /work/vikunja-unstable-linux-amd64
-    /work/vikunja-latest.zip
-    || true'
-
 jobs:
   mage:
     runs-on: self-hosted
@@ -28,8 +10,6 @@ jobs:
     env:
       GOPATH: /tmp/go-${{ github.run_id }}-${{ github.run_attempt }}-mage
     steps:
-      - name: Reset workspace
-        run: ${{ env.WORKSPACE_CLEAN_CMD }}
       - uses: actions/checkout@v4 # v6
       - name: Set up Go
         uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5 # v6
@@ -60,8 +40,6 @@ jobs:
     env:
       GOPATH: /tmp/go-${{ github.run_id }}-${{ github.run_attempt }}-api-build
     steps:
-      - name: Reset workspace
-        run: ${{ env.WORKSPACE_CLEAN_CMD }}
       - uses: actions/checkout@v4 # v6
         with:
           fetch-depth: 0
@@ -97,8 +75,6 @@ jobs:
     env:
       GOPATH: /tmp/go-${{ github.run_id }}-${{ github.run_attempt }}-api-lint
     steps:
-      - name: Reset workspace
-        run: ${{ env.WORKSPACE_CLEAN_CMD }}
       - uses: actions/checkout@v4 # v6
       - uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5 # v6
         with:
@@ -116,8 +92,6 @@ jobs:
     runs-on: self-hosted
     needs: mage
     steps:
-      - name: Reset workspace
-        run: ${{ env.WORKSPACE_CLEAN_CMD }}
       - uses: actions/checkout@v4 # v6
       - name: Download Mage Binary
         uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
@@ -154,8 +128,6 @@ jobs:
           POSTGRES_PASSWORD: vikunjatest
           POSTGRES_DB: vikunjatest
     steps:
-      - name: Reset workspace
-        run: ${{ env.WORKSPACE_CLEAN_CMD }}
       - name: Download Unstable
         run: |
           rm -f /tmp/vikunja-unstable-linux-amd64 /tmp/vikunja-latest.zip
@@ -292,8 +264,6 @@ jobs:
         ports:
           - "8389:389"
     steps:
-      - name: Reset workspace
-        run: ${{ env.WORKSPACE_CLEAN_CMD }}
       - uses: actions/checkout@v4 # v6
       - name: Download Mage Binary
         uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
@@ -391,8 +361,6 @@ jobs:
         ports:
           - 9000:9000
     steps:
-      - name: Reset workspace
-        run: ${{ env.WORKSPACE_CLEAN_CMD }}
       - uses: actions/checkout@v4 # v6
       - name: Download Mage Binary
         uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
@@ -424,8 +392,6 @@ jobs:
   frontend-lint:
     runs-on: self-hosted
     steps:
-      - name: Reset workspace
-        run: ${{ env.WORKSPACE_CLEAN_CMD }}
       - uses: actions/checkout@v4 # v6
       - uses: ./.github/actions/setup-frontend
       - name: Lint
@@ -435,8 +401,6 @@ jobs:
   frontend-stylelint:
     runs-on: self-hosted
     steps:
-      - name: Reset workspace
-        run: ${{ env.WORKSPACE_CLEAN_CMD }}
       - uses: actions/checkout@v4 # v6
       - uses: ./.github/actions/setup-frontend
       - name: Lint styles
@@ -446,8 +410,6 @@ jobs:
   frontend-typecheck:
     runs-on: self-hosted
     steps:
-      - name: Reset workspace
-        run: ${{ env.WORKSPACE_CLEAN_CMD }}
       - uses: actions/checkout@v4 # v6
       - uses: ./.github/actions/setup-frontend
       - name: Typecheck
@@ -458,8 +420,6 @@ jobs:
   test-frontend-unit:
     runs-on: self-hosted
     steps:
-      - name: Reset workspace
-        run: ${{ env.WORKSPACE_CLEAN_CMD }}
       - uses: actions/checkout@v4 # v6
       - uses: ./.github/actions/setup-frontend
       - name: Run unit tests
@@ -469,8 +429,6 @@ jobs:
   frontend-build:
     runs-on: self-hosted
     steps:
-      - name: Reset workspace
-        run: ${{ env.WORKSPACE_CLEAN_CMD }}
       - uses: actions/checkout@v4 # v6
         with:
           fetch-depth: 0
