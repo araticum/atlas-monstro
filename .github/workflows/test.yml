@@ -253,16 +253,22 @@ jobs:
         env:
           MYSQL_ROOT_PASSWORD: vikunjatest
           MYSQL_DATABASE: vikunjatest
+        ports:
+          - "3306:3306"
       db-postgres:
         image: ${{ matrix.postgres_image || '' }}
         env:
           POSTGRES_PASSWORD: vikunjatest
           POSTGRES_DB: vikunjatest
+        ports:
+          - "5432:5432"
       db-paradedb:
         image: ${{ matrix.paradedb_image || '' }}
         env:
           POSTGRES_PASSWORD: vikunjatest
           POSTGRES_DB: vikunjatest
+        ports:
+          - "5432:5432"
       test-ldap:
         image: gitea/test-openldap@sha256:b66527e298d6062d5289dc411d1b8da1c593f8140a3d1f863e8d9d021234122f
         ports:
@@ -363,7 +369,7 @@ jobs:
           MINIO_ROOT_PASSWORD: vikunjatest
           MINIO_DEFAULT_BUCKETS: vikunja-test
         ports:
-          - 9000:9000
+          - "9000:9000"
     steps:
       - uses: actions/checkout@v4 # v6
       - name: Download Mage Binary
@@ -379,7 +385,7 @@ jobs:
           VIKUNJA_TESTS_USE_CONFIG: 1
           VIKUNJA_DATABASE_TYPE: sqlite
           VIKUNJA_FILES_TYPE: s3
-          VIKUNJA_FILES_S3_ENDPOINT: http://test-minio:9000
+          VIKUNJA_FILES_S3_ENDPOINT: http://localhost:9000
           VIKUNJA_FILES_S3_BUCKET: vikunja-test
           VIKUNJA_FILES_S3_REGION: us-east-1
           VIKUNJA_FILES_S3_ACCESSKEY: vikunja
