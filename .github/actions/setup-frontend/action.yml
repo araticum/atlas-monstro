@@ -27,7 +27,7 @@ runs:
         echo "PNPM_HOME=${PNPM_DIR}" >> $GITHUB_ENV
         echo "npm_config_cache=${NPM_CACHE_DIR}" >> $GITHUB_ENV
         echo "XDG_CACHE_HOME=${XDG_CACHE_DIR}" >> $GITHUB_ENV
-    - uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061
+    - uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v4.4.0
       with:
         run_install: false
         package_json_file: frontend/package.json

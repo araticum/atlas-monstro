@@ -10,7 +10,7 @@ jobs:
       contents: read
       packages: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 0
       - name: Git describe
@@ -19,7 +19,7 @@ jobs:
           GIT_DESC=$(git describe --tags --always --dirty 2>/dev/null || echo "unstable")
           echo "describe=$GIT_DESC" >> $GITHUB_OUTPUT
       - name: Login to GHCR
-        uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef # v3
+        uses: docker/login-action@b45d80f862d83dbcd57f89517bcf500b2ab88fb2 # v4.0.0
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
@@ -38,7 +38,7 @@ jobs:
             type=raw,value=latest
       - name: Build and push unstable
         if: ${{ github.ref_type != 'tag' }}
-        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6
+        uses: docker/build-push-action@d08e5c354a6adb9ed34480a06d141179aa583294 # v7.0.0
         with:
           platforms: linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64/v8
           push: true
@@ -48,7 +48,7 @@ jobs:
             RELEASE_VERSION=${{ steps.ghd.outputs.describe }}
       - name: Build and push version
         if: ${{ github.ref_type == 'tag' }}
-        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6
+        uses: docker/build-push-action@d08e5c354a6adb9ed34480a06d141179aa583294 # v7.0.0
         with:
           platforms: linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64/v8
           push: true
@@ -58,10 +58,11 @@ jobs:
             RELEASE_VERSION=${{ steps.ghd.outputs.describe }}
 
   binaries:
+    # Disabled for this fork until release signing + S3 publishing secrets are wired up; the docker image is the only release artifact currently shipped.
     if: ${{ false }}
     runs-on: self-hosted
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 0
       - name: Git describe
@@ -148,6 +149,7 @@ jobs:
           path: ./dist/zip/*
 
   os-package:
+    # Disabled for this fork because nfpm packages depend on the binary/S3 release pipeline above, which is not configured here yet.
     if: ${{ false }}
     runs-on: self-hosted
     needs:
@@ -161,7 +163,7 @@ jobs:
           - archlinux
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 0
       - name: Download Vikunja Binary
@@ -213,10 +215,11 @@ jobs:
           path: ./dist/os-packages/*
 
   config-yaml:
+    # Disabled for this fork because publishing config.yml.sample only to the upstream S3 release bucket is not useful without that distribution channel.
     if: ${{ false }}
     runs-on: self-hosted
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 0
       - name: Git describe
@@ -244,6 +247,7 @@ jobs:
           files: "config.yml.sample"
 
   desktop:
+    # Disabled for this fork: desktop installers are upstream-specific and require extra signing/release infrastructure we do not maintain.
     if: ${{ false }}
     strategy:
       matrix:
@@ -254,7 +258,7 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 0
       - name: Git describe
@@ -263,7 +267,7 @@ jobs:
           GIT_DESC=$(git describe --tags --always --dirty 2>/dev/null || echo "unstable")
           echo "describe=$GIT_DESC" >> $GITHUB_OUTPUT
       - name: Install pnpm
-        uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # v4
+        uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320 # v4.4.0
         with:
           package_json_file: desktop/package.json
       - name: Setup Node
@@ -309,13 +313,14 @@ jobs:
             !./desktop/dist/*.blockmap
 
   generate-swagger-docs:
+    # Disabled for release runs in this fork: auto-committing generated swagger files from a release workflow would mutate refs during publishing.
     if: ${{ false }}
     runs-on: self-hosted
     permissions:
       contents: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
           persist-credentials: true
@@ -355,6 +360,7 @@ jobs:
           branch: ${{ github.ref }}
 
   create-release:
+    # Disabled for now because this fork does not currently build/sign the binary, OS package, and desktop artifacts that this draft release bundles.
     if: ${{ false }}
     runs-on: self-hosted
     needs:
