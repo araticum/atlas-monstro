@@ -152,7 +152,7 @@ jobs:
           VIKUNJA_DATABASE_PASSWORD: vikunjatest
           VIKUNJA_DATABASE_DATABASE: vikunjatest
           VIKUNJA_DATABASE_SSLMODE: disable
-          VIKUNJA_DATABASE_HOST: 127.0.0.1
+          VIKUNJA_DATABASE_HOST: ${{ matrix.db == 'postgres' && 'migration-smoke-db-postgres' || matrix.db == 'mysql' && 'migration-smoke-db-mysql' || '127.0.0.1' }}
           VIKUNJA_LOG_DATABASE: stdout
           VIKUNJA_LOG_DATABASELEVEL: debug
           VIKUNJA_SERVICE_PUBLICURL: http://127.0.0.1:3456
@@ -162,7 +162,7 @@ jobs:
             echo "Waiting for MySQL to be ready..."
             READY=0
             for i in $(seq 1 30); do
-              if mysql -h 127.0.0.1 -u root -pvikunjatest -e "SELECT 1" >/dev/null 2>&1; then
+              if mysql -h migration-smoke-db-mysql -u root -pvikunjatest -e "SELECT 1" >/dev/null 2>&1; then
                 READY=1
                 break
               fi
@@ -183,7 +183,7 @@ jobs:
             echo "Waiting for PostgreSQL to be ready..."
             READY=0
             for i in $(seq 1 30); do
-              if PGPASSWORD=vikunjatest psql -h 127.0.0.1 -U postgres -d vikunjatest -c "SELECT 1" >/dev/null 2>&1; then
+              if PGPASSWORD=vikunjatest psql -h migration-smoke-db-postgres -U postgres -d vikunjatest -c "SELECT 1" >/dev/null 2>&1; then
                 READY=1
                 break
               fi
@@ -375,7 +375,7 @@ jobs:
           VIKUNJA_TESTS_USE_CONFIG: 1
           VIKUNJA_DATABASE_TYPE: sqlite
           VIKUNJA_FILES_TYPE: s3
-          VIKUNJA_FILES_S3_ENDPOINT: http://localhost:9000
+          VIKUNJA_FILES_S3_ENDPOINT: http://test-minio:9000
           VIKUNJA_FILES_S3_BUCKET: vikunja-test
           VIKUNJA_FILES_S3_REGION: us-east-1
           VIKUNJA_FILES_S3_ACCESSKEY: vikunja
