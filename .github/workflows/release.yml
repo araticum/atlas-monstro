@@ -6,6 +6,9 @@ on:
 jobs:
   docker:
     runs-on: self-hosted
+    permissions:
+      contents: read
+      packages: write
     steps:
       - uses: actions/checkout@v4
         with:
@@ -15,17 +18,12 @@ jobs:
         run: |
           GIT_DESC=$(git describe --tags --always --dirty 2>/dev/null || echo "unstable")
           echo "describe=$GIT_DESC" >> $GITHUB_OUTPUT
-      - name: Login to Docker Hub
-        uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef # v3
-        with:
-          username: ${{ secrets.DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.DOCKER_HUB_PASSWORD }}
       - name: Login to GHCR
         uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef # v3
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ github.token }}
       - name: Docker meta version
         if: ${{ github.ref_type == 'tag' }}
         id: meta
