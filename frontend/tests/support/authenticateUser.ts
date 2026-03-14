@@ -28,6 +28,10 @@ export async function login(page: Page | null, apiContext: APIRequestContext, us
 
 	// Set token and API_URL before navigating (only if page is provided)
 	if (page) {
+		// Note: this helper only seeds the browser with the short-lived JWT. The
+		// refresh token cookie stays in the APIRequestContext cookie jar, so app
+		// code that proactively calls /user/token/refresh may log an expected 401
+		// in E2E runs until the test logs in through the browser itself.
 		// Use 127.0.0.1 instead of localhost to match the frontend's origin for CORS
 		const apiUrl = process.env.API_URL || 'http://127.0.0.1:3456/api/v1'
 		await page.addInitScript(({token, apiUrl}) => {

@@ -10,7 +10,7 @@ jobs:
     env:
       GOPATH: /tmp/go-${{ github.run_id }}-${{ github.run_attempt }}-mage
     steps:
-      - uses: actions/checkout@v4 # v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Set up Go
         uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5 # v6
         with:
@@ -40,7 +40,7 @@ jobs:
     env:
       GOPATH: /tmp/go-${{ github.run_id }}-${{ github.run_attempt }}-api-build
     steps:
-      - uses: actions/checkout@v4 # v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 0
       - name: Download Mage Binary
@@ -75,7 +75,7 @@ jobs:
     env:
       GOPATH: /tmp/go-${{ github.run_id }}-${{ github.run_attempt }}-api-lint
     steps:
-      - uses: actions/checkout@v4 # v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5 # v6
         with:
           go-version-file: go.mod
@@ -92,7 +92,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: mage
     steps:
-      - uses: actions/checkout@v4 # v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Download Mage Binary
         uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
         with:
@@ -274,7 +274,7 @@ jobs:
         ports:
           - "8389:389"
     steps:
-      - uses: actions/checkout@v4 # v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Download Mage Binary
         uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
         with:
@@ -371,7 +371,7 @@ jobs:
         ports:
           - "9000:9000"
     steps:
-      - uses: actions/checkout@v4 # v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Download Mage Binary
         uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
         with:
@@ -402,7 +402,7 @@ jobs:
   frontend-lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4 # v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - uses: ./.github/actions/setup-frontend
       - name: Lint
         working-directory: frontend
@@ -411,7 +411,7 @@ jobs:
   frontend-stylelint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4 # v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - uses: ./.github/actions/setup-frontend
       - name: Lint styles
         working-directory: frontend
@@ -420,7 +420,7 @@ jobs:
   frontend-typecheck:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4 # v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - uses: ./.github/actions/setup-frontend
       - name: Typecheck
         continue-on-error: true
@@ -430,7 +430,7 @@ jobs:
   test-frontend-unit:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4 # v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - uses: ./.github/actions/setup-frontend
       - name: Run unit tests
         working-directory: frontend
@@ -439,7 +439,7 @@ jobs:
   frontend-build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4 # v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 0
       - uses: ./.github/actions/setup-frontend
@@ -481,7 +481,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: actions/checkout@v4 # v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Download Vikunja Binary
         uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
         with:
