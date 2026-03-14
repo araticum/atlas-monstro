@@ -516,9 +516,11 @@ jobs:
           VIKUNJA_AUTH_OPENID_PROVIDERS_DEX_CLIENTSECRET: secret
         run: |
           docker run --rm             --network host             -u root             -e PLAYWRIGHT_SKIP_VALIDATE_HOST_REQUIREMENTS             -e TEST_SECRET             -e VIKUNJA_SERVICE_TESTINGTOKEN             -e VIKUNJA_LOG_LEVEL             -e VIKUNJA_CORS_ENABLE             -e VIKUNJA_SERVICE_PUBLICURL             -e VIKUNJA_DATABASE_PATH             -e VIKUNJA_DATABASE_TYPE             -e VIKUNJA_RATELIMIT_NOAUTHLIMIT             -e VIKUNJA_AUTH_OPENID_ENABLED             -e VIKUNJA_AUTH_OPENID_PROVIDERS_DEX_NAME             -e VIKUNJA_AUTH_OPENID_PROVIDERS_DEX_AUTHURL             -e VIKUNJA_AUTH_OPENID_PROVIDERS_DEX_CLIENTID             -e VIKUNJA_AUTH_OPENID_PROVIDERS_DEX_CLIENTSECRET             -v "${{ github.workspace }}:/work"             -w /work/frontend             mcr.microsoft.com/playwright:v1.58.2-jammy@sha256:4698a73749c5848d3f5fcd42a2174d172fcad2b2283e087843b115424303a565             bash -lc '
+              corepack enable
+              corepack prepare pnpm@10.28.1 --activate
               pnpm run preview:vikunja &
               pnpm run preview &
-              pnpx wait-on http-get://127.0.0.1:4173 http-get://127.0.0.1:3456/api/v1/info --timeout 60000
+              pnpm exec wait-on http-get://127.0.0.1:4173 http-get://127.0.0.1:3456/api/v1/info --timeout 60000
               pnpm run test:e2e --shard=${{ matrix.shard }}/${{ matrix.total-shards }}
             '
       - name: Fix workspace ownership after root run
